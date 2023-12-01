@@ -56,7 +56,7 @@ class Graphe
 	{
 		for (std::map<char, Graphe*>::iterator it = _childs.begin(); it != _childs.end(); ++it)
 		{
-			it->second->_delete();
+			_alloc.destroy(it->second);
 			_alloc.deallocate(it->second, 1);
 			it->second = 0;
 		}
