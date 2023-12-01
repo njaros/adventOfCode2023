@@ -22,7 +22,4 @@
   <ItemGroup>
     <None Include="input.txt" />
   </ItemGroup>
-  <ItemGroup>
-    <Text Include="input2.txt" />
-  </ItemGroup>
 </Project>

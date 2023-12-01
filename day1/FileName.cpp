@@ -7,6 +7,7 @@
 
 class Graphe
 {
+	std::allocator<Graphe> _alloc;
 	std::map<char, Graphe*> _childs;
 	int _value;
 	int _weight;
@@ -25,7 +26,8 @@ class Graphe
 			Graphe* child = 0;
 			if (_childs.find(*cit) == _childs.end())
 			{
-				child = new Graphe();
+				child = _alloc.allocate(1);
+				_alloc.construct(child, Graphe());
 				_childs[*cit] = child;
 			}
 			else
@@ -55,7 +57,7 @@ class Graphe
 		for (std::map<char, Graphe*>::iterator it = _childs.begin(); it != _childs.end(); ++it)
 		{
 			it->second->_delete();
-			delete(it->second);
+			_alloc.deallocate(it->second, 1);
 			it->second = 0;
 		}
 	}
@@ -79,7 +81,7 @@ public:
 
 	~Graphe()
 	{
-		//_delete();
+		_delete();
 	}
 
 	void add(const std::string& str, int v)
@@ -89,7 +91,6 @@ public:
 
 	const Graphe* browse(char c) const
 	{
-		Graphe* ret = 0;
 		std::map<char, Graphe*>::const_iterator find = _childs.find(c);
 		if (find != _childs.end())
 			return find->second;
@@ -255,7 +256,6 @@ int main()
 		}
 	}
 	input.close();
-	std::cout << "not 54890" << std::endl;
 	std::cout << "response : " << sum << "\r\n";
 	return 0;
 }
