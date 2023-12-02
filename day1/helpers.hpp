@@ -6,6 +6,8 @@
 #include <string>
 #include <map>
 
+typedef std::pair<int, int> Coord;
+
 unsigned int secureGetNumber()
 {
 	std::string buffer;
@@ -13,21 +15,25 @@ unsigned int secureGetNumber()
 	return atoi(buffer.c_str());
 }
 
-int getFileAndPart(int day, std::ifstream* in, unsigned int& part, bool withFile)
+int getFileAndPart(int day, std::ifstream* in, unsigned int* part)
 {
-	if (withFile)
+	if (in)
 	{
-		in->open("./input" + std::to_string(day) + ".txt");
+		std::string toOpen = "./input" + std::to_string(day) + ".txt";
+		in->open(toOpen);
 		if (in->fail())
 		{
-			std::cerr << "Couldn't open file ./Input.txt : " << strerror(errno) << std::endl;
-			return errno;
+			std::cerr << "Couldn't open file " << toOpen << " : " << strerror(errno) << std::endl;
+			return 1;
 		}
 	}
-	std::cout << "wich part ? (1 or 2)\r\n";
-	std::cin >> part;
-	if (part != 2)
-		part = 1;
+	if (part)
+	{
+		std::cout << "wich part ? (1 or 2)\r\n";
+		std::cin >> *part;
+		if (*part != 2)
+			*part = 1;
+	}
 	return 0;
 }
 

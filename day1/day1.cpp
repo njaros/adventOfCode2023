@@ -6,7 +6,7 @@ int day1()
 	unsigned int part;
 	int sum = 0;
 
-	if (getFileAndPart(1, &input, part, 1))
+	if (getFileAndPart(1, &input, &part))
 		return errno;
 
 	if (part == 1)
