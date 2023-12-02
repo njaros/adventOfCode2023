@@ -1,141 +1,16 @@
-#pragma warning(disable: 4996)
+#include "helpers.hpp"
 
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <map>
-
-class Graphe
+int day1()
 {
-	std::allocator<Graphe> _alloc;
-	std::map<char, Graphe*> _childs;
-	int _value;
-	int _weight;
-
-	int& _addRecu(const std::string& str, int v, std::string::const_iterator cit)
-	{
-		if (cit == str.end())
-		{
-			_value = v;
-			++_weight;
-			return _value;
-		}
-		else
-		{
-			++_weight;
-			Graphe* child = 0;
-			if (_childs.find(*cit) == _childs.end())
-			{
-				child = _alloc.allocate(1);
-				_alloc.construct(child, Graphe());
-				_childs[*cit] = child;
-			}
-			else
-				child = _childs[*cit];
-			return child->_addRecu(str, v, ++cit);
-		}
-	}
-
-	int _search(const std::string& str, std::string::const_iterator cit) const
-	{
-		if (cit == str.end())
-		{
-			return _value;
-		}
-		else
-		{
-			if (_childs.find(*cit) == _childs.end())
-			{
-				return 0;
-			}
-			return _childs.find(*cit)->second->_search(str, ++cit);
-		}
-	}
-
-	void _delete()
-	{
-		for (std::map<char, Graphe*>::iterator it = _childs.begin(); it != _childs.end(); ++it)
-		{
-			_alloc.destroy(it->second);
-			_alloc.deallocate(it->second, 1);
-			it->second = 0;
-		}
-	}
-
-	void _print(std::string str) const
-	{
-		if (_value)
-			std::cout << str << " : " << _value << std::endl;
-		else
-		{
-			for (std::pair<char, Graphe*> elt : _childs)
-			{
-				elt.second->_print(str + elt.first);
-			}
-		}
-	}
-
-public:
-
-	Graphe() : _value(0), _weight(0) {}
-
-	~Graphe()
-	{
-		_delete();
-	}
-
-	void add(const std::string& str, int v)
-	{
-		_addRecu(str, v, str.begin());
-	}
-
-	const Graphe* browse(char c) const
-	{
-		std::map<char, Graphe*>::const_iterator find = _childs.find(c);
-		if (find != _childs.end())
-			return find->second;
-		return 0;
-	}
-
-	int& operator[](const std::string& str)
-	{
-		return _addRecu(str, int(), str.begin());
-	}
-
-	int operator[](const std::string& str) const
-	{
-		return _search(str, str.begin());
-	}
-
-	int getValue() const
-	{
-		return _value;
-	}
-
-	void print() const
-	{
-		_print("");
-	}
-};
-
-
-
-int main()
-{
-	std::ifstream input("./input.txt");
-	if (input.fail())
-	{
-		std::cerr << "Couldn't open file ./Input.txt : " << strerror(errno) << std::endl;
-		return errno;
-	}
-	int part = 1;
-	std::cout << "wich part ? (1 or 2)\r\n";
-	std::cin >> part;
+	std::ifstream input;
+	unsigned int part;
 	int sum = 0;
+
+	if (getFileAndPart(1, &input, part, 1))
+		return errno;
 
 	if (part == 1)
 	{
-
 		char c;
 		int first = -1;
 		int last = 0;
@@ -185,7 +60,7 @@ int main()
 		std::string line;
 		std::string::const_iterator first;
 		std::string::const_reverse_iterator last;
-		int forward;
+		std::string::size_type forward;
 		const Graphe* browser = 0;
 
 		while (!input.eof())
