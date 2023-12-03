@@ -5,7 +5,6 @@ int getNumberFromSymbol(Coord idx, const Grid<char>& g, std::set<Coord>& visited
 	int ret = 0;
 	Coord left(idx);
 	int exp = 1;
-	static int tamere = 0;
 
 	if (isdigit(g(idx)))
 	{
@@ -84,30 +83,23 @@ int day3()
 	getFileAndPart(3, &input, &part);
 
 	Grid<char> grid;
+	std::set<Coord> symbolsPos;
 	char c = input.get();
 	while (c != EOF)
 	{
 		grid.addBackElt(c, '\n', { '\r' });
+		if (isSymbol(c, part))
+			symbolsPos.insert(Coord(grid.back().size() - 1, grid.size() - 1));
 		c = input.get();
 	}
 	input.close();
 
 	int sum = 0;
-	Coord idx(0, 0);
-	char debug;
 	std::set<Coord> visited;
-	while (idx.second < grid.size())
-	{
-		idx.first = 0;
-		while (idx.first < grid[idx.second].size())
-		{
-			debug = grid(idx);
-			if (isSymbol(grid(idx), part))
-				sum += addNumbersNear(idx, grid, visited, part);
-			++idx.first;
-		}
-		++idx.second;
-	}
+
+	for (Coord idx : symbolsPos)
+		sum += addNumbersNear(idx, grid, visited, part);
+
 	std::cout << "result is : " << sum << std::endl;
 	return 0;
 }
