@@ -66,7 +66,7 @@ std::ostream& operator<<(std::ostream& o, const Coord& c)
 //Usefull simple class and their typedefs
 
 template <class T>
-struct Grid : public std::vector<std::vector<T>> {
+class Grid : public std::vector<std::vector<T>> {
 
 public:
 
