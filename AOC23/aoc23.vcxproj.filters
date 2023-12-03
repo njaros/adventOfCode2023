@@ -30,6 +30,9 @@
     <ClCompile Include="day2.cpp">
       <Filter>Fichiers sources\days</Filter>
     </ClCompile>
+    <ClCompile Include="day3.cpp">
+      <Filter>Fichiers sources\days</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="helpers.hpp">
@@ -46,6 +49,9 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="input2.txt">
+      <Filter>inputs</Filter>
+    </Text>
+    <Text Include="input3.txt">
       <Filter>inputs</Filter>
     </Text>
   </ItemGroup>

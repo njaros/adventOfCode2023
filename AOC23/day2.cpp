@@ -1,3 +1,4 @@
+#pragma warning(disable: 4554)
 #include "helpers.hpp"
 
 int day2()

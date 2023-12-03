@@ -5,8 +5,127 @@
 #include <fstream>
 #include <string>
 #include <map>
+#include <set>
+#include <vector>
+#include <deque>
+#include <unordered_map>
+#include <unordered_set>
+
+//Usefull typedefs
 
 typedef std::pair<int, int> Coord;
+
+Coord& operator+=(Coord& lhs, const Coord& rhs)
+{
+	lhs.first += rhs.first;
+	lhs.second += rhs.second;
+	return lhs;
+}
+
+Coord& operator-=(Coord& lhs, const Coord& rhs)
+{
+	lhs.first -= rhs.first;
+	lhs.second -= rhs.second;
+	return lhs;
+}
+
+Coord operator+(const Coord& lhs, const Coord& rhs)
+{
+	Coord ret;
+	ret.first = lhs.first + rhs.first;
+	ret.second = lhs.second + rhs.second;
+	return ret;
+}
+
+Coord operator-(const Coord& lhs, const Coord& rhs)
+{
+	Coord ret;
+	ret.first = lhs.first - rhs.first;
+	ret.second = lhs.second - rhs.second;
+	return ret;
+}
+
+//Some << overloads
+
+template <class T>
+std::ostream& operator<<(std::ostream& o, const std::vector<T>& l)
+{
+	for (const T& elt : l)
+	{
+		o << elt;
+	}
+	o << std::endl;
+	return o;
+}
+
+std::ostream& operator<<(std::ostream& o, const Coord& c)
+{
+	return o << '(' << c.first << ", " << c.second << ')';
+}
+
+//Usefull simple class and their typedefs
+
+template <class T>
+struct Grid : public std::vector<std::vector<T>> {
+
+public:
+
+	typedef std::vector<T> line;
+
+	void addBackElt(const T& elt, const T& newLine)
+	{
+		if (this->empty())
+			this->push_back(line());
+		if (elt == newLine)
+			this->push_back(line());
+		else
+			this->back().push_back(elt);
+	}
+
+	void addBackElt(const T& elt, const T& newLine, const std::set<T>& ignoreSet)
+	{
+		if (ignoreSet.find(elt) == ignoreSet.end())
+			this->addBackElt(elt, newLine);
+	}
+
+	const T& get(const Coord& c) const
+	{
+		return this->at(c.second).at(c.first);
+	}
+
+
+	T& get(const Coord& c)
+	{
+		return this->at(c.second).at(c.first);
+	}
+
+	const T& operator()(const Coord& c) const
+	{
+		return get(c);
+	}
+
+	T& operator()(const Coord& c)
+	{
+		return get(c);
+	}
+
+	T getCopy(const Coord& c) const
+	{
+		return this->at(c.second).at(c.first);
+	}
+};
+
+template <class T>
+std::ostream& operator<<(std::ostream& o, const Grid<T>& g)
+{
+	for (const std::vector<T>& elt : g)
+	{
+		o << elt;
+	}
+	return o;
+}
+
+//Some usefull functions I need each times
 
 unsigned int secureGetNumber()
 {
@@ -36,6 +155,8 @@ int getFileAndPart(int day, std::ifstream* in, unsigned int* part)
 	}
 	return 0;
 }
+
+//Usefull class and containers
 
 class Graphe
 {
@@ -84,16 +205,6 @@ class Graphe
 		}
 	}
 
-	void _delete()
-	{
-		for (std::map<char, Graphe*>::iterator it = _childs.begin(); it != _childs.end(); ++it)
-		{
-			_alloc.destroy(it->second);
-			_alloc.deallocate(it->second, 1);
-			it->second = 0;
-		}
-	}
-
 	void _print(std::string str) const
 	{
 		if (_value)
@@ -113,7 +224,12 @@ public:
 
 	~Graphe()
 	{
-		_delete();
+		for (std::map<char, Graphe*>::iterator it = _childs.begin(); it != _childs.end(); ++it)
+		{
+			_alloc.destroy(it->second);
+			_alloc.deallocate(it->second, 1);
+			it->second = 0;
+		}
 	}
 
 	void add(const std::string& str, int v)

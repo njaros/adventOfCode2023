@@ -29,6 +29,9 @@ int main()
 			case 2:
 				day2();
 				break;
+			case 3:
+				day3();
+				break;
 			default:
 				std::cout << "not implemented yet\r\n";
 			}
