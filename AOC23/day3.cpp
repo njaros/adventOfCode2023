@@ -87,6 +87,7 @@ int day3()
 		grid.addBackElt(c, '\n', { '\r' });
 		c = input.get();
 	}
+	input.close();
 
 	int sum = 0;
 	Coord idx(0, 0);
