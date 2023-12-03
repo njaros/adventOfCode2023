@@ -13,20 +13,23 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="inputs">
+      <UniqueIdentifier>{52cc8aeb-c209-4bf2-9b34-d8af246a128b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\days">
+      <UniqueIdentifier>{99778b4c-ab97-4dca-a59b-1308a97fec2f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="day1.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
     <ClCompile Include="entryPoint.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="day2.cpp">
-      <Filter>Fichiers sources</Filter>
+    <ClCompile Include="day1.cpp">
+      <Filter>Fichiers sources\days</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="input1.txt" />
+    <ClCompile Include="day2.cpp">
+      <Filter>Fichiers sources\days</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="helpers.hpp">
@@ -37,6 +40,13 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="input2.txt" />
+    <None Include="input1.txt">
+      <Filter>inputs</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="input2.txt">
+      <Filter>inputs</Filter>
+    </Text>
   </ItemGroup>
 </Project>
