@@ -30,9 +30,12 @@ int getNumberFromSymbol(Coord idx, const Grid<char>& g, std::set<Coord>& visited
 	return ret;
 }
 
-bool isSymbol(char c)
+bool isSymbol(char c, int part)
 {
-	return (!isdigit(c) && c != '.');
+	if (part == 1)
+		return (!isdigit(c) && c != '.');
+	else
+		return (c == '*');
 }
 
 int addNumbersNear(const Coord& idx, const Grid<char>& g, std::set<Coord>& visited, int part)
@@ -99,7 +102,7 @@ int day3()
 		while (idx.first < grid[idx.second].size())
 		{
 			debug = grid(idx);
-			if (isSymbol(grid(idx)))
+			if (isSymbol(grid(idx), part))
 				sum += addNumbersNear(idx, grid, visited, part);
 			++idx.first;
 		}

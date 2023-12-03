@@ -5,16 +5,18 @@
 int main()
 {
 	unsigned int day;
+	int err;
 	while (1)
 	{
 		day = 1;
+		err = 0;
 
 		std::cout << "Hello, select your day (0 to quit) : ";
 		day = secureGetNumber();
 
 		if (day > 31)
 		{
-			std::cout << "impossible: day can't exceed 31\r\n";
+			std::cout << "impossible: day can't exceed 31" << std::endl;
 		}
 
 		else
@@ -24,17 +26,21 @@ int main()
 			case 0:
 				return 0;
 			case 1:
-				day1();
+				err = day1();
 				break;
 			case 2:
-				day2();
+				err = day2();
 				break;
 			case 3:
-				day3();
+				err = day3();
 				break;
 			default:
-				std::cout << "not implemented yet\r\n";
+				std::cout << "not implemented yet" << std::endl;
 			}
+		}
+		if (err)
+		{
+			std::cout << "a problem occured." << std::endl;
 		}
 	}
 }
