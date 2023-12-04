@@ -1,9 +1,13 @@
-#pragma once
+#ifndef HELPERS_HPP
+#define HELPERS_HPP
 #pragma warning(disable: 4996)
 
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cstring>
+#include <math.h>
+#include <algorithm>
 #include <map>
 #include <set>
 #include <vector>
@@ -15,42 +19,17 @@
 
 typedef std::pair<int, int> Coord;
 
-Coord& operator+=(Coord& lhs, const Coord& rhs)
-{
-	lhs.first += rhs.first;
-	lhs.second += rhs.second;
-	return lhs;
-}
-
-Coord& operator-=(Coord& lhs, const Coord& rhs)
-{
-	lhs.first -= rhs.first;
-	lhs.second -= rhs.second;
-	return lhs;
-}
-
-Coord operator+(const Coord& lhs, const Coord& rhs)
-{
-	Coord ret;
-	ret.first = lhs.first + rhs.first;
-	ret.second = lhs.second + rhs.second;
-	return ret;
-}
-
-Coord operator-(const Coord& lhs, const Coord& rhs)
-{
-	Coord ret;
-	ret.first = lhs.first - rhs.first;
-	ret.second = lhs.second - rhs.second;
-	return ret;
-}
 
 //Some << overloads
 
+Coord& operator+=(Coord& lhs, const Coord& rhs);
+Coord& operator-=(Coord& lhs, const Coord& rhs);
+Coord operator+(const Coord& lhs, const Coord& rhs);
+Coord operator-(const Coord& lhs, const Coord& rhs);
 template <class T>
-std::ostream& operator<<(std::ostream& o, const std::vector<T>& l)
+std::ostream& operator<<(std::ostream& o, const std::vector<T>& v)
 {
-	for (const T& elt : l)
+	for (const T& elt : v)
 	{
 		o << elt;
 	}
@@ -58,10 +37,29 @@ std::ostream& operator<<(std::ostream& o, const std::vector<T>& l)
 	return o;
 }
 
-std::ostream& operator<<(std::ostream& o, const Coord& c)
+template <class T>
+std::ostream& operator<<(std::ostream& o, const std::set<T>& s)
 {
-	return o << '(' << c.first << ", " << c.second << ')';
+	for (typename std::set<T>::const_iterator cit = s.begin(); cit != s.end(); ++cit)
+	{
+		o << *cit << ' ';
+	}
+	o << std::endl;
+	return o;
 }
+
+std::ostream& operator<<(std::ostream& o, const Coord& c);
+
+template <class T, class U>
+std::ostream& operator<<(std::ostream& o, const std::map<T, U>& m)
+{
+	for (typename std::map<T, U>::const_iterator cit = m.begin(); cit != m.end(); ++cit)
+	{
+		o << cit->first << " | " << cit->second << std::endl;
+	}
+	return o;
+}
+
 
 //Usefull simple class and their typedefs
 
@@ -127,34 +125,9 @@ std::ostream& operator<<(std::ostream& o, const Grid<T>& g)
 
 //Some usefull functions I need each times
 
-unsigned int secureGetNumber()
-{
-	std::string buffer;
-	std::cin >> buffer;
-	return atoi(buffer.c_str());
-}
+unsigned int secureGetNumber();
 
-int getFileAndPart(int day, std::ifstream* in, unsigned int* part)
-{
-	if (in)
-	{
-		std::string toOpen = "./input" + std::to_string(day) + ".txt";
-		in->open(toOpen);
-		if (in->fail())
-		{
-			std::cerr << "Couldn't open file " << toOpen << " : " << strerror(errno) << std::endl;
-			return 1;
-		}
-	}
-	if (part)
-	{
-		std::cout << "wich part ? (1 or 2)\r\n";
-		std::cin >> *part;
-		if (*part != 2)
-			*part = 1;
-	}
-	return 0;
-}
+int getFileAndPart(int day, std::ifstream* in, unsigned int* part);
 
 //Usefull class and containers
 
@@ -265,3 +238,5 @@ public:
 		_print("");
 	}
 };
+
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef DAYS_HPP
+#define DAYS_HPP
 
 int day1();
 int day2();
@@ -31,3 +32,5 @@ int day28();
 int day29();
 int day30();
 int day31();
+
+#endif
