@@ -127,8 +127,9 @@ unsigned int secureGetNumber();
 
 int getFileAndPart(int day, std::ifstream* in, unsigned int* part);
 
-std::pair<long, bool> getNumberFromStream(std::ifstream& input, char& c);
+std::pair<long, bool> getNextNumberOnLineFromStream(std::ifstream& input, char& c);
 
+void goToNextLine(std::ifstream& input, char& c);
 //Usefull class and containers
 
 template<class T, class U>
@@ -187,14 +188,14 @@ class Graphe
 		}
 	}
 
-
 	void _print(std::vector< T > v) const
 	{
 		if (_valueReadable)
 			std::cout << v << " : " << _value << std::endl;
 		for (std::pair< T, Graphe< T, U >* > elt : _childs)
 		{
-			elt.second->_print(v.push_back(elt.first));
+			v.push_back(elt.first);
+			elt.second->_print(v);
 			v.pop_back();
 		}
 	}
