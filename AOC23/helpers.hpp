@@ -33,7 +33,6 @@ std::ostream& operator<<(std::ostream& o, const std::vector<T>& v)
 	{
 		o << elt;
 	}
-	o << std::endl;
 	return o;
 }
 
@@ -44,7 +43,6 @@ std::ostream& operator<<(std::ostream& o, const std::set<T>& s)
 	{
 		o << *cit << ' ';
 	}
-	o << std::endl;
 	return o;
 }
 
@@ -129,75 +127,85 @@ unsigned int secureGetNumber();
 
 int getFileAndPart(int day, std::ifstream* in, unsigned int* part);
 
+std::pair<long, bool> getNumberFromStream(std::ifstream& input, char& c);
+
 //Usefull class and containers
 
+template<class T, class U>
 class Graphe
 {
-	std::allocator<Graphe> _alloc;
-	std::map<char, Graphe*> _childs;
-	int _value;
-	int _weight;
+	std::allocator< Graphe< T, U > > _alloc;
+	std::map< T, Graphe< T, U >* > _childs;
+	U _value;
+	size_t _weight;
+	bool _valueReadable;
 
-	int& _addRecu(const std::string& str, int v, std::string::const_iterator cit)
+	template<class container>
+	U& _addRecu(const container& str, const U& v, typename container::const_iterator cit, bool override)
 	{
+		bool writeValue = override;
 		if (cit == str.end())
 		{
-			_value = v;
-			++_weight;
+			_valueReadable = true;
+			if (override)
+				_value = v;
 			return _value;
 		}
 		else
 		{
-			++_weight;
 			Graphe* child = 0;
 			if (_childs.find(*cit) == _childs.end())
 			{
 				child = _alloc.allocate(1);
-				_alloc.construct(child, Graphe());
+				_alloc.construct(child, Graphe< T, U >());
 				_childs[*cit] = child;
+				writeValue = true;
 			}
 			else
 				child = _childs[*cit];
-			return child->_addRecu(str, v, ++cit);
+			return child->_addRecu(str, v, ++cit, writeValue);
 		}
 	}
 
-	int _search(const std::string& str, std::string::const_iterator cit) const
+	template<class container>
+	std::pair<U, bool> _search(const container& c, typename container::const_iterator cit) const
 	{
-		if (cit == str.end())
+		if (cit == c.end())
 		{
-			return _value;
+			if (_valueReadable)
+				return std::make_pair(_value, true);
+			else
+				return std::make_pair(U(), false);
 		}
 		else
 		{
 			if (_childs.find(*cit) == _childs.end())
 			{
-				return 0;
+				return std::make_pair(U(), false);
 			}
-			return _childs.find(*cit)->second->_search(str, ++cit);
+			return _childs.find(*cit)->second->_search(c, ++cit);
 		}
 	}
 
-	void _print(std::string str) const
+
+	void _print(std::vector< T > v) const
 	{
-		if (_value)
-			std::cout << str << " : " << _value << std::endl;
-		else
+		if (_valueReadable)
+			std::cout << v << " : " << _value << std::endl;
+		for (std::pair< T, Graphe< T, U >* > elt : _childs)
 		{
-			for (std::pair<char, Graphe*> elt : _childs)
-			{
-				elt.second->_print(str + elt.first);
-			}
+			elt.second->_print(v.push_back(elt.first));
+			v.pop_back();
 		}
 	}
 
 public:
 
-	Graphe() : _value(0), _weight(0) {}
+	Graphe() : _value(U()), _weight(0), _valueReadable(false) {}
 
 	~Graphe()
 	{
-		for (std::map<char, Graphe*>::iterator it = _childs.begin(); it != _childs.end(); ++it)
+		for (typename std::map< T, Graphe< T, U>* >::iterator it = _childs.begin(); it != _childs.end(); ++it)
 		{
 			_alloc.destroy(it->second);
 			_alloc.deallocate(it->second, 1);
@@ -205,37 +213,57 @@ public:
 		}
 	}
 
-	void add(const std::string& str, int v)
+	template <class container>
+	void add(const container& c, U v)
 	{
-		_addRecu(str, v, str.begin());
+		_addRecu(c, v, c.begin(), true);
 	}
 
-	const Graphe* browse(char c) const
+	const Graphe< T, U >* browse(const T& c) const
 	{
-		std::map<char, Graphe*>::const_iterator find = _childs.find(c);
+		typename std::map< T, Graphe< T, U >* >::const_iterator find = _childs.find(c);
 		if (find != _childs.end())
 			return find->second;
 		return 0;
 	}
 
-	int& operator[](const std::string& str)
+	U& operator[](const char* str)
 	{
-		return _addRecu(str, int(), str.begin());
+		std::string cont(str);
+		return _addRecu(cont, U(), cont.begin(), false);
 	}
 
-	int operator[](const std::string& str) const
+	U operator[](const char* str) const
 	{
-		return _search(str, str.begin());
+		std::string cont(str);
+		return _search(cont, cont.begin()).first;
 	}
 
-	int getValue() const
+	template <class container>
+	U& operator[](const container& c)
+	{
+		return _addRecu(c, U(), c.begin(), false);
+	}
+
+	template <class container>
+	U operator[](const container& c) const
+	{
+		return _search(c, c.begin()).first;
+	}
+
+	U getValue() const
 	{
 		return _value;
 	}
 
+	bool valueReadable() const
+	{
+		return _valueReadable;
+	}
+
 	void print() const
 	{
-		_print("");
+		_print(std::vector< T >());
 	}
 };
 

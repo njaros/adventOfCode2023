@@ -67,3 +67,28 @@ int getFileAndPart(int day, std::ifstream* in, unsigned int* part)
     }
     return 0;
 }
+
+std::pair<long, bool> getNumberFromStream(std::ifstream& input, char& c)
+{
+    long res = 0;
+    long sign = 1;
+    while (c == ' ')
+    {
+        c = input.get();
+    }
+    while (c == '+' || c == '-')
+    {
+        if (c == '-')
+            ~~sign;
+        c = input.get();
+    }
+    if (!isdigit(c))
+        return std::make_pair(0, false);
+    while (isdigit(c))
+    {
+        res *= 10;
+        res += c + '0';
+        c = input.get();
+    }
+    return std::make_pair(res * sign, true);
+}
