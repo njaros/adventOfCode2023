@@ -4,7 +4,6 @@ using namespace inputLib;
 
 typedef std::pair< unsigned long, unsigned long > Range;
 typedef std::set< Range > RangeSet;
-typedef std::map< Range, RangeSet > Seeds;
 typedef std::vector< Range > Todos;
 
 void insertNotMatch(RangeSet& notMatch, const RangeSet& match, Range r)
@@ -259,7 +258,7 @@ unsigned long part2(std::ifstream& input)
 		res = notMatched.begin()->first;
 	for (Range r : todoNext)
 	{
-		if (r.first < res)
+		if (r.first && r.first < res)
 			res = r.first;
 	}
 	return res;
@@ -274,7 +273,7 @@ int day5()
 	if (part == 2)
 	{
 		std::cout << "result is " << part2(input) << std::endl;
-		std::cout << "not 0, 46692542" << std::endl;
+		std::cout << "not 0, 46692542, 985862499" << std::endl;
 		input.close();
 		return 0;
 	}
