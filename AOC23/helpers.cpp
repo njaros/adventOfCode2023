@@ -68,35 +68,39 @@ int getFileAndPart(int day, std::ifstream* in, unsigned int* part)
 	return 0;
 }
 
-std::pair<long, bool> getNextNumberOnLineFromStream(std::ifstream& input, char& c)
+std::pair<long, bool> inputLib::ExtractNextNumber(std::ifstream& input, char& monitorChar)
 {
 	long res = 0;
 	long sign = 1;
-	while (c != '\n' && c != EOF)
+	while (monitorChar != '\n' && monitorChar != EOF)
 	{
-		if (isdigit(c))
+		if (isdigit(monitorChar))
 		{
-			while (isdigit(c))
+			while (isdigit(monitorChar))
 			{
 				res *= 10;
-				res += c - '0';
-				c = input.get();
+				res += monitorChar - '0';
+				monitorChar = input.get();
 			}
 			return std::make_pair(res * sign, true);
 		}
-		if (c != '+' && c != '-')
+		if (monitorChar != '+' && monitorChar != '-')
 			sign = 1;
-		else if (c == '-')
+		else if (monitorChar == '-')
 			~~sign;
-		c = input.get();
+		monitorChar = input.get();
 	}
 	return std::make_pair(res, false);
 }
 
-void goToNextLine(std::ifstream& input, char& u)
+char inputLib::goToNextLine(std::ifstream& input, char& monitorChar, unsigned int times)
 {
-	while (u != '\n' && u != EOF)
-		u = input.get();
-	if (u == '\n')
-		u = input.get();
+	while (times-- && monitorChar != EOF)
+	{
+		while (monitorChar != '\n' && monitorChar != EOF)
+			monitorChar = input.get();
+		if (monitorChar == '\n')
+			monitorChar = input.get();
+	}
+	return monitorChar;
 }

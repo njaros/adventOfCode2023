@@ -8,6 +8,7 @@
 #include <cstring>
 #include <math.h>
 #include <algorithm>
+#include <tuple>
 #include <map>
 #include <set>
 #include <vector>
@@ -18,7 +19,6 @@
 //Usefull typedefs
 
 typedef std::pair<int, int> Coord;
-
 
 //Some << overloads
 
@@ -127,9 +127,12 @@ unsigned int secureGetNumber();
 
 int getFileAndPart(int day, std::ifstream* in, unsigned int* part);
 
-std::pair<long, bool> getNextNumberOnLineFromStream(std::ifstream& input, char& c);
+namespace inputLib
+{
+	std::pair<long, bool> ExtractNextNumber(std::ifstream& input, char& monitorChar);
 
-void goToNextLine(std::ifstream& input, char& c);
+	char goToNextLine(std::ifstream& input, char& monitorChar, unsigned int times = 1);
+}
 //Usefull class and containers
 
 template<class T, class U>

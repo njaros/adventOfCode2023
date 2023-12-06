@@ -1,167 +1,266 @@
 #include "helpers.hpp"
 
+using namespace inputLib;
+
 typedef std::pair< unsigned long, unsigned long > Range;
 typedef std::set< Range > RangeSet;
 typedef std::map< Range, RangeSet > Seeds;
+typedef std::vector< Range > Todos;
 
-void insertRange(Seeds& seeds, Range r)
+void insertNotMatch(RangeSet& notMatch, const RangeSet& match, Range r)
 {
-	unsigned long minR;
-	unsigned long maxR;
-	unsigned long minElt;
-	unsigned long maxElt;
+	Range tool;
 
-	for (std::pair<Range, RangeSet> elt : seeds)
+	for (Range elt : match)
 	{
-		minR = r.first;
-		maxR = minR + r.second - 1;
-		minElt = elt.first.first;
-		maxElt = minElt + elt.first.second - 1;
-		if (minR > maxElt || maxR < minElt)
+		/*
+				[---]
+			[-----------]
+		*/
+		if (r.first >= elt.first && r.second <= elt.second)
+			return;
+		/*
+			[---]			||			[---]
+					[---]	||	[---]
+		*/
+		if (r.second < elt.first || r.first > elt.second)
 			continue;
-		if (minR >= minElt)
+		/*
+			[-----]
+				[----]
+		*/
+		if (r.first <= elt.first && r.second <= elt.second)
 		{
-			if (maxR > maxElt)
-			{
-				r.first = minElt;
-				r.second = maxR - minElt + 1;
-				seeds.erase(elt.first);
-				seeds[r] = RangeSet();
-			}
-			return;
+			r.second = elt.first - 1;
 		}
-		else if (minR < minElt)
+		/*
+				[-----]
+			[-----]
+		*/
+		else if (r.first >= elt.first && r.second >= elt.second)
 		{
-			if (maxR < maxElt)
-				r.second = maxElt - minR + 1;
-			seeds.erase(elt.first);
-			seeds[r] = RangeSet();
-			return;
+			r.first = elt.second + 1;
+		}
+		/*
+			[-----------]
+				[---]
+		*/
+		else if (r.first < elt.first && r.second > elt.second)
+		{
+			tool.first = elt.second + 1;
+			tool.second = r.second;
+			insertNotMatch(notMatch, match, tool);
+			r.second = elt.first - 1;
 		}
 	}
-	seeds[r] = RangeSet();
+	notMatch.insert(r);
+}
+
+void insertMatch(RangeSet& notMatch, RangeSet& match, Range r)
+{
+	Range tool;
+	RangeSet toAddWhenFinished;
+	RangeSet::iterator it = notMatch.begin();
+	RangeSet::iterator toDelete;
+
+	match.insert(r);
+	while (it != notMatch.end())
+	{
+		/*
+			[---]			||			[---]
+					[---]	||	[---]
+		*/
+		if (r.second < it->first)
+			return;
+		if (r.first > it->second)
+		{
+			it++;
+		}
+		/*
+			[-----------]
+				[---]
+		*/
+		else if (r.first <= it->first && r.second >= it->second)
+		{
+			toDelete = it++;
+			notMatch.erase(toDelete);
+		}
+		/*
+				[---]
+			[-----------]
+		*/
+		else if (r.first > it->first && r.second < it->second)
+		{
+			tool.first = it->first;
+			tool.second = r.first - 1;
+			toAddWhenFinished.insert(tool);
+			tool.first = r.second + 1;
+			tool.second = it->second;
+			toAddWhenFinished.insert(tool);
+			toDelete = it++;
+			notMatch.erase(toDelete);
+		}
+		/*
+			[-----]
+				[----]
+		*/
+		else if (r.first <= it->first && r.second <= it->second)
+		{
+			tool.first = r.second + 1;
+			tool.second = it->second;
+			toAddWhenFinished.insert(tool);
+			toDelete = it++;
+			notMatch.erase(toDelete);
+		}
+		/*
+				[-----]
+			[-----]
+		*/
+		else if (r.first >= it->first && r.second >= it->second)
+		{
+			tool.first = it->first;
+			tool.second = r.first - 1;
+			toAddWhenFinished.insert(tool);
+			toDelete = it++;
+			notMatch.erase(toDelete);
+		}
+	}
+	notMatch.insert(toAddWhenFinished.begin(), toAddWhenFinished.end());
+}
+
+void manageNextTodos(const Todos& todo, Todos& todoNext, RangeSet& match, RangeSet& notMatch, unsigned long minS, unsigned long maxS, unsigned long destStart)
+{
+	Range tool;
+	for (Range elt : todo)
+	{
+		/*
+			[---]			||			[---]
+					[---]	||	[---]
+		*/
+		if (elt.second < minS || elt.first > maxS)
+		{
+			insertNotMatch(notMatch, match, elt);
+		}
+		/*
+			[-----]
+				[----]
+		*/
+		else if (elt.first >= minS && elt.second >= maxS)
+		{
+			tool.first = minS;
+			tool.second = elt.second;
+			insertMatch(notMatch, match, tool);
+			tool.first = destStart;
+			tool.second = destStart + (elt.second - minS);
+			todoNext.push_back(tool);
+			tool.first = elt.first;
+			tool.second = minS - 1;
+			insertNotMatch(notMatch, match, tool);
+		}
+		/*
+				[-----]
+			[-----]
+		*/
+		else if (elt.first <= minS && elt.second <= maxS)
+		{
+			tool.first = elt.first;
+			tool.second = maxS;
+			insertMatch(notMatch, match, tool);
+			tool.first = destStart + (elt.first - minS);
+			tool.second = tool.first + (maxS - elt.first);
+			todoNext.push_back(tool);
+			tool.first = maxS + 1;
+			tool.second = elt.second;
+			insertNotMatch(notMatch, match, tool);
+		}
+		/*
+			[--------]
+				[---]
+		*/
+		else if (elt.first < minS && elt.second > maxS)
+		{
+			tool.first = minS;
+			tool.second = maxS;
+			insertMatch(notMatch, match, tool);
+			tool.first = destStart;
+			tool.second = destStart + (maxS - minS);
+			todoNext.push_back(tool);
+			tool.first = elt.first;
+			tool.second = minS - 1;
+			insertNotMatch(notMatch, match, tool);
+			tool.first = maxS + 1;
+			tool.second = elt.second;
+			insertNotMatch(notMatch, match, tool);
+		}
+		/*
+				[---]
+			[-----------]
+		*/
+		else
+		{
+			insertMatch(notMatch, match, elt);
+			tool.first = destStart + (elt.first - minS);
+			tool.second = tool.first + (elt.second - elt.first);
+			todoNext.push_back(tool);
+		}
+	}
 }
 
 unsigned long part2(std::ifstream& input)
 {
 	unsigned long res = ~0;
-	Seeds seeds;
-	Seeds rests;
-	RangeSet temp;
-	Range tool;
+	unsigned long sourceMin;
+	unsigned long sourceMax;
+	unsigned long destStart;
+	Todos todo;
+	Todos todoNext;
+	RangeSet notMatched;
+	RangeSet matched;
+	Range rangeRead;
 	std::pair< unsigned long, bool > nbRead;
-	unsigned long dest;
-	unsigned long source;
-	unsigned long range;
-	unsigned long minElt;
-	unsigned long maxElt;
-	unsigned long minS;
-	unsigned long maxS;
 	char c;
-	int loop = 0;
-
+	bool anoeud = true;
 	c = input.get();
-	nbRead = getNextNumberOnLineFromStream(input, c);
+
+	nbRead = ExtractNextNumber(input, c);
 	while (nbRead.second)
 	{
-		tool.first = nbRead.first;
-		tool.second = getNextNumberOnLineFromStream(input, c).first;
-		seeds[tool] = RangeSet();
-		nbRead = getNextNumberOnLineFromStream(input, c);
-	}
-	goToNextLine(input, c);
-	goToNextLine(input, c);
-	while (c != EOF)
-	{
-		std::cout << "loop " << ++loop << std::endl;
-		nbRead = getNextNumberOnLineFromStream(input, c);
-		if (!nbRead.second)
-		{
-			goToNextLine(input, c);
-			goToNextLine(input, c);
-			for (std::pair< Range, RangeSet > elt : seeds)
-			{
-				if (elt.second.empty())
-					temp.insert(elt.first);
-				else
-				{
-					for (Range Selt : elt.second)
-						temp.insert(Selt);
-				}
-			}
-			seeds.clear();
-			for (Range elt : temp)
-			{
-				insertRange(seeds, elt);
-			}
-			for (std::pair< Range, RangeSet > elt : rests)
-			{
-				insertRange(seeds, elt.first);
-			}
-			rests.clear();
-			temp.clear();
-		}
+		if (anoeud)
+			rangeRead.first = nbRead.first;
 		else
 		{
-			dest = nbRead.first;
-			source = getNextNumberOnLineFromStream(input, c).first;
-			range = getNextNumberOnLineFromStream(input, c).first;
-			for (Seeds::iterator elt = seeds.begin(); elt != seeds.end(); ++elt)
-			{
-				minElt = elt->first.first;
-				maxElt = minElt + elt->first.second - 1;
-				minS = source;
-				maxS = source + range - 1;
-				if (minElt > maxS || maxElt < minS)
-					continue;
-				if (minElt >= minS && maxElt <= maxS)
-				{
-					tool.first = dest + minElt - minS;
-					tool.second = elt->first.second;
-					elt->second.insert(tool);
-				}
-				else if (minElt >= minS && maxElt > maxS)
-				{
-					tool.first = dest + minElt - minS;
-					tool.second = 1 + maxS - minElt;
-					elt->second.insert(tool);
-					tool.first = maxS + 1;
-					tool.second = maxElt - maxS + 1;
-					rests[tool] = RangeSet();
-				}
-				else if (minElt < minS && maxElt <= maxS)
-				{
-					tool.first = dest;
-					tool.second = maxElt - minS + 1;
-					elt->second.insert(tool);
-					tool.first = minElt;
-					tool.second = minS - minElt;
-					rests[tool] = RangeSet();
-				}
-				else if (minElt < minS && maxElt > maxS)
-				{
-					tool.first = dest;
-					tool.second = range;
-					elt->second.insert(tool);
-					tool.first = minElt;
-					tool.second = minS - minElt;
-					rests[tool] = RangeSet();
-					tool.first = maxS + 1;
-					tool.second = maxElt - maxS;
-					rests[tool] = RangeSet();
-				}
-			}
+			rangeRead.second = rangeRead.first + nbRead.first - 1;
+			todo.push_back(rangeRead);
 		}
-		goToNextLine(input, c);
+		anoeud = !anoeud;
+		nbRead = ExtractNextNumber(input, c);
 	}
-
-	for (Seeds::const_iterator cit = seeds.begin(); cit != seeds.end(); ++cit)
+	goToNextLine(input, c, 2);
+	while (c != EOF)
 	{
-		for (Range r : cit->second)
+		if (goToNextLine(input, c) == '\n')
 		{
-			if (r.first < res)
-				res = r.first;
+			matched.clear();
+			todo = todoNext;
+			todo.insert(todo.end(), notMatched.begin(), notMatched.end());
+			todoNext.clear();
+			notMatched.clear();
 		}
+		nbRead = ExtractNextNumber(input, c);
+		if (nbRead.second)
+		{
+			destStart = nbRead.first;
+			sourceMin = ExtractNextNumber(input, c).first;
+			sourceMax = ExtractNextNumber(input, c).first + sourceMin - 1;
+			manageNextTodos(todo, todoNext, matched, notMatched, sourceMin, sourceMax, destStart);
+		}
+	}
+	if (!notMatched.empty())
+		res = notMatched.begin()->first;
+	for (Range r : todoNext)
+	{
+		if (r.first < res)
+			res = r.first;
 	}
 	return res;
 }
@@ -175,7 +274,7 @@ int day5()
 	if (part == 2)
 	{
 		std::cout << "result is " << part2(input) << std::endl;
-		std::cout << "not 0" << std::endl;
+		std::cout << "not 0, 46692542" << std::endl;
 		input.close();
 		return 0;
 	}
@@ -188,21 +287,19 @@ int day5()
 	unsigned long range;
 	unsigned long result = ~0;
 	c = input.get();
-	nbRead = getNextNumberOnLineFromStream(input, c);
+	nbRead = ExtractNextNumber(input, c);
 	while (nbRead.second)
 	{
 		seeds[nbRead.first] = std::set< unsigned long >();
-		nbRead = getNextNumberOnLineFromStream(input, c);
+		nbRead = ExtractNextNumber(input, c);
 	}
-	goToNextLine(input, c);
-	goToNextLine(input, c);
+	goToNextLine(input, c, 2);
 	while (c != EOF)
 	{
-		nbRead = getNextNumberOnLineFromStream(input, c);
+		nbRead = ExtractNextNumber(input, c);
 		if (!nbRead.second)
 		{
-			goToNextLine(input, c);
-			goToNextLine(input, c);
+			goToNextLine(input, c, 2);
 			for (std::pair< unsigned long, std::set< unsigned long > > elt : seeds)
 			{
 				if (elt.second.empty())
@@ -223,8 +320,8 @@ int day5()
 		else
 		{
 			dest = nbRead.first;
-			source = getNextNumberOnLineFromStream(input, c).first;
-			range = getNextNumberOnLineFromStream(input, c).first;
+			source = ExtractNextNumber(input, c).first;
+			range = ExtractNextNumber(input, c).first;
 			for (std::map< unsigned long, std::set< unsigned long > >::iterator elt = seeds.begin(); elt != seeds.end(); ++elt)
 			{
 				if (elt->first >= source && elt->first < source + range)
