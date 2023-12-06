@@ -19,6 +19,7 @@
 //Usefull typedefs
 
 typedef std::pair<int, int> Coord;
+typedef std::pair<long, bool> NumberRead;
 
 //Some << overloads
 
