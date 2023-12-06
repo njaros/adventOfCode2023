@@ -30,10 +30,10 @@ int calculatePoints(std::set<int>& win, std::map<int, int>& nbs, unsigned int pa
 			{
 				if (!res)
 				{
-					res = pow(2, elt.second - 1);
+					res = static_cast<int>(pow(2, elt.second - 1));
 				}
 				else {
-					res *= pow(2, elt.second);
+					res *= static_cast<int>(pow(2, elt.second));
 				}
 			}
 			else

@@ -89,7 +89,7 @@ int day3()
 	{
 		grid.addBackElt(c, '\n', { '\r' });
 		if (isSymbol(c, part))
-			symbolsPos.insert(Coord(grid.back().size() - 1, grid.size() - 1));
+			symbolsPos.insert(Coord((int)grid.back().size() - 1, (int)grid.size() - 1));
 		c = input.get();
 	}
 	input.close();

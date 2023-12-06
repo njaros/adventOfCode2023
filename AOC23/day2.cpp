@@ -33,7 +33,7 @@ int day2()
 			b = 0;
 		}
 		idx = 0;
-		while (idx < line.size() & (!rip | part == 2))
+		while (idx < line.size() && (!rip || part == 2))
 		{
 			if (isdigit(line[idx]))
 			{
@@ -43,19 +43,19 @@ int day2()
 				switch (line[idx])
 				{
 				case 'g':
-					if (part == 1 & tmp > 13)
+					if (part == 1 && tmp > 13)
 						rip = true;
 					else if (tmp > g)
 						g = tmp;
 					break;
 				case 'r':
-					if (part == 1 & tmp > 12)
+					if (part == 1 && tmp > 12)
 						rip = true;
 					else if (tmp > r)
 						r = tmp;
 					break;
 				case 'b':
-					if (part == 1 & tmp > 14)
+					if (part == 1 && tmp > 14)
 						rip = true;
 					else if (tmp > b)
 						b = tmp;

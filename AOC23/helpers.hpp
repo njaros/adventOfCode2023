@@ -13,6 +13,8 @@
 #include <set>
 #include <vector>
 #include <deque>
+#include <optional>
+#include <iomanip>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -139,7 +141,8 @@ namespace inputLib
 template<class T, class U>
 class Graphe
 {
-	std::allocator< Graphe< T, U > > _alloc;
+	std::allocator< Graphe < T, U > > Alloc;
+	std::allocator_traits< std::allocator< Graphe< T, U > > > _alloc;
 	std::map< T, Graphe< T, U >* > _childs;
 	U _value;
 	size_t _weight;
@@ -161,8 +164,8 @@ class Graphe
 			Graphe* child = 0;
 			if (_childs.find(*cit) == _childs.end())
 			{
-				child = _alloc.allocate(1);
-				_alloc.construct(child, Graphe< T, U >());
+				child = _alloc.allocate(Alloc, 1);
+				_alloc.construct(Alloc, child, Graphe< T, U >());
 				_childs[*cit] = child;
 				writeValue = true;
 			}
@@ -179,15 +182,12 @@ class Graphe
 		{
 			if (_valueReadable)
 				return std::make_pair(_value, true);
-			else
-				return std::make_pair(U(), false);
+			return std::make_pair(U(), false);
 		}
 		else
 		{
 			if (_childs.find(*cit) == _childs.end())
-			{
 				return std::make_pair(U(), false);
-			}
 			return _childs.find(*cit)->second->_search(c, ++cit);
 		}
 	}
@@ -212,8 +212,8 @@ public:
 	{
 		for (typename std::map< T, Graphe< T, U>* >::iterator it = _childs.begin(); it != _childs.end(); ++it)
 		{
-			_alloc.destroy(it->second);
-			_alloc.deallocate(it->second, 1);
+			_alloc.destroy(Alloc, it->second);
+			_alloc.deallocate(Alloc, it->second, 1);
 			it->second = 0;
 		}
 	}

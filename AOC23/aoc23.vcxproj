@@ -105,6 +105,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -136,6 +137,7 @@
     <ClCompile Include="day4.cpp" />
     <ClCompile Include="day5.cpp" />
     <ClCompile Include="day6.cpp" />
+    <ClCompile Include="day7.cpp" />
     <ClCompile Include="entryPoint.cpp" />
     <ClCompile Include="helpers.cpp" />
   </ItemGroup>

@@ -87,7 +87,7 @@ std::pair<long, bool> inputLib::ExtractNextNumber(std::ifstream& input, char& mo
 		if (monitorChar != '+' && monitorChar != '-')
 			sign = 1;
 		else if (monitorChar == '-')
-			~~sign;
+			sign = ~sign;
 		monitorChar = input.get();
 	}
 	return std::make_pair(res, false);
