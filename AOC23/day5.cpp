@@ -145,7 +145,7 @@ void manageNextTodos(const Todos& todo, Todos& todoNext, RangeSet& match, RangeS
 			[-----]
 				[----]
 		*/
-		else if (elt.first >= minS && elt.second >= maxS)
+		else if (elt.first <= minS && elt.second <= maxS)
 		{
 			tool.first = minS;
 			tool.second = elt.second;
@@ -161,7 +161,7 @@ void manageNextTodos(const Todos& todo, Todos& todoNext, RangeSet& match, RangeS
 				[-----]
 			[-----]
 		*/
-		else if (elt.first <= minS && elt.second <= maxS)
+		else if (elt.first >= minS && elt.second >= maxS)
 		{
 			tool.first = elt.first;
 			tool.second = maxS;
