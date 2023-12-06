@@ -273,7 +273,6 @@ int day5()
 	if (part == 2)
 	{
 		std::cout << "result is " << part2(input) << std::endl;
-		std::cout << "not 0, 46692542, 985862499" << std::endl;
 		input.close();
 		return 0;
 	}
