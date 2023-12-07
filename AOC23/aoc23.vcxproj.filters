@@ -78,5 +78,8 @@
     <Text Include="input6.txt">
       <Filter>inputs</Filter>
     </Text>
+    <Text Include="input7.txt">
+      <Filter>inputs</Filter>
+    </Text>
   </ItemGroup>
 </Project>
