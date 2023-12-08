@@ -3,7 +3,7 @@
 typedef std::pair< std::string, std::string > Ways;
 typedef std::map< std::string, Ways > Map;
 
-std::pair< std::vector< int >, int > reduce(const std::vector< std::pair< int, int > >& v)
+std::pair< std::vector< int >, int > PGCDed(const std::vector< std::pair< int, int > >& v)
 {
 	std::vector< int > r;
 	std::pair< int, int > rP;
@@ -151,7 +151,7 @@ int day8()
 			resVec.push_back(resElt);
 		}
 
-		std::pair< std::vector< int >, int > reduced = reduce(resVec);
+		std::pair< std::vector< int >, int > reduced = PGCDed(resVec);
 		
 		result = reduced.second;
 
