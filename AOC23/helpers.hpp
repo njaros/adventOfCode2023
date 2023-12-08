@@ -135,6 +135,9 @@ namespace inputLib
 	std::pair<long, bool> ExtractNextNumber(std::ifstream& input, char& monitorChar);
 
 	char goToNextLine(std::ifstream& input, char& monitorChar, unsigned int times = 1);
+
+	void goToNextLine(std::ifstream& input, unsigned int times = 1);
+
 }
 //Usefull class and containers
 

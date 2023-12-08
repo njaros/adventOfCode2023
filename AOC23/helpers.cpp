@@ -104,3 +104,13 @@ char inputLib::goToNextLine(std::ifstream& input, char& monitorChar, unsigned in
 	}
 	return monitorChar;
 }
+
+void inputLib::goToNextLine(std::ifstream& input, unsigned int times)
+{
+	char monitorChar = input.get();
+	while (times-- && monitorChar != EOF)
+	{
+		while (monitorChar != '\n' && monitorChar != EOF)
+			monitorChar = input.get();
+	}
+}

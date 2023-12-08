@@ -81,7 +81,7 @@ int day8()
 	Map map;
 	Ways ways;
 	getline(input, instruction);
-	getline(input, line);
+	inputLib::goToNextLine(input);
 
 	while (!input.eof())
 	{
@@ -129,7 +129,7 @@ int day8()
 				if (++idx >= instruction.size())
 					idx = 0;
 			}
-			resElt.first = result;
+			resElt.first = (int)result;
 			++result;
 			if (instruction[idx] == 'L')
 				str = map[str].first;
@@ -147,7 +147,7 @@ int day8()
 				if (++idx >= instruction.size())
 					idx = 0;
 			}
-			resElt.second = result - resElt.first;
+			resElt.second = (int)result - resElt.first;
 			resVec.push_back(resElt);
 		}
 
