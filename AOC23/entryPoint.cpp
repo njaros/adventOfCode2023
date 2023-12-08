@@ -16,7 +16,7 @@ int main()
 
 		if (day > 31)
 		{
-			std::cout << "impossible: day can't exceed 31" << std::endl;
+			std::cout << "impossible: day can't exceed 25" << std::endl;
 		}
 
 		else
@@ -45,6 +45,9 @@ int main()
 				break;
 			case 7:
 				err = day7();
+				break;
+			case 8:
+				err = day8();
 				break;
 			default:
 				std::cout << "not implemented yet" << std::endl;
