@@ -14,7 +14,7 @@ int main()
 		std::cout << "Hello, select your day (0 to quit) : ";
 		day = secureGetNumber();
 
-		if (day > 31)
+		if (day > 25)
 		{
 			std::cout << "impossible: day can't exceed 25" << std::endl;
 		}
@@ -48,6 +48,9 @@ int main()
 				break;
 			case 8:
 				err = day8();
+				break;
+			case 9:
+				err = day9();
 				break;
 			default:
 				std::cout << "not implemented yet" << std::endl;

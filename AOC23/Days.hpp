@@ -26,11 +26,5 @@ int day22();
 int day23();
 int day24();
 int day25();
-int day26();
-int day27();
-int day28();
-int day29();
-int day30();
-int day31();
 
 #endif

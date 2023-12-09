@@ -132,7 +132,10 @@ int getFileAndPart(int day, std::ifstream* in, unsigned int* part);
 
 namespace inputLib
 {
+
 	std::pair<long, bool> ExtractNextNumber(std::ifstream& input, char& monitorChar);
+
+	std::pair< std::optional<long> , char> ExtractNextNumber(std::ifstream& input);
 
 	char goToNextLine(std::ifstream& input, char& monitorChar, unsigned int times = 1);
 
