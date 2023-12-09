@@ -3,28 +3,20 @@
 typedef std::pair< std::string, std::string > Ways;
 typedef std::map< std::string, Ways > Map;
 
-std::pair< std::vector< int >, int > PGCDed(const std::vector< std::pair< int, int > >& v)
+std::pair< std::vector< int >, int > PGCDed(const std::vector< int >& v)
 {
 	std::vector< int > r;
-	std::pair< int, int > rP;
-	int max = v[0].first / 2;
-	int divide = max;
+	int divide = v[0] / 2;
 	bool broke;
+
 	while (divide > 1)
 	{
 		broke = false;
-		for (std::pair< int, int > p : v)
+		for (int p : v)
 		{
-			while (p.first > 0)
-				p.first -= divide;
-			if (p.first < 0)
-			{
-				broke = true;
-				break;
-			}
-			while (p.second > 0)
-				p.second -= divide;
-			if (p.second < 0)
+			while (p > 0)
+				p -= divide;
+			if (p < 0)
 			{
 				broke = true;
 				break;
@@ -32,39 +24,13 @@ std::pair< std::vector< int >, int > PGCDed(const std::vector< std::pair< int, i
 		}
 		if (!broke)
 		{
-			for (const std::pair< int, int >& p : v)
-			{
-				rP.first = p.first / divide;
-				rP.second = p.second / divide;
-				r.push_back(rP.first);
-			}
+			for (const int& p : v)
+				r.push_back(p / divide);
 			return std::make_pair(r, divide);
 		}
 		--divide;
 	}
-	for (const std::pair< int, int >& p : v)
-	{
-		r.push_back(p.first);
-	}
-	return std::make_pair(r, divide);
-}
-
-bool isGoodTime(unsigned int t, const std::vector< std::pair< int, int > >& v)
-{
-	std::vector< std::pair< int, int > >::size_type idx = 0;
-	long long oTime;
-	long long limit = (t + 1) * v[idx].first;
-	++idx;
-	while  (idx < v.size())
-	{
-		oTime = 0;
-		while (oTime < limit)
-			oTime += v[idx].first;
-		if (oTime > limit)
-			return false;
-		idx++;
-	}
-	return true;
+	return std::make_pair(v, divide);
 }
 
 int day8()
@@ -113,8 +79,7 @@ int day8()
 	}
 	else
 	{
-		std::vector< std::pair< int, int > > resVec;
-		std::pair< int, int > resElt;
+		std::vector< int > resVec;
 		for (std::string& str : posVec)
 		{
 			result = 0;
@@ -129,26 +94,7 @@ int day8()
 				if (++idx >= instruction.size())
 					idx = 0;
 			}
-			resElt.first = (int)result;
-			++result;
-			if (instruction[idx] == 'L')
-				str = map[str].first;
-			else
-				str = map[str].second;
-			if (++idx >= instruction.size())
-				idx = 0;
-			while (str[2] != 'Z')
-			{
-				++result;
-				if (instruction[idx] == 'L')
-					str = map[str].first;
-				else
-					str = map[str].second;
-				if (++idx >= instruction.size())
-					idx = 0;
-			}
-			resElt.second = (int)result - resElt.first;
-			resVec.push_back(resElt);
+			resVec.push_back((int)result);
 		}
 
 		std::pair< std::vector< int >, int > reduced = PGCDed(resVec);

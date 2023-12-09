@@ -54,6 +54,9 @@
     <ClCompile Include="day9.cpp">
       <Filter>Fichiers sources\days</Filter>
     </ClCompile>
+    <ClCompile Include="day10.cpp">
+      <Filter>Fichiers sources\days</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="helpers.hpp">

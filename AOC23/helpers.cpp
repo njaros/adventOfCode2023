@@ -68,6 +68,61 @@ int getFileAndPart(int day, std::ifstream* in, unsigned int* part)
 	return 0;
 }
 
+long long intPow(long long a, long long b)
+{
+	long long res = 1;
+
+	if (b < 0)
+		return 0;
+	while (b--)
+		res *= a;
+	return a;
+}
+
+std::optional< long long > divisible(long long a_, long long b_) /*work in progress*/
+{
+	long result = 1;
+	int exp = 0;
+	unsigned long long a;
+	unsigned long long b;
+	bool sign = ((a_ < 0) != (b_ < 0));
+	unsigned long long bStart;
+	unsigned long long bitReader = ((long long)1) << (0x3f);
+
+	std::cerr << "divisible function isn't finished !!\n";
+	if (!b_)
+		return std::nullopt;
+	if (!a_)
+		return 0;
+	if (a_ < 0)
+		a = -a_;
+	else
+		a = a_;
+	if (b_ < 0)
+		b = -b_;
+	else
+		b = b_;
+	if (a < b)
+		return std::nullopt;
+
+	while (!(bitReader & b))
+		bitReader >>= 1;
+	bStart = bitReader;
+	while (bitReader)
+	{
+		if ((bitReader & b) != (bitReader & a))
+			return std::nullopt;
+		--bitReader;
+	}
+	bitReader = bStart << 1;
+	while (bitReader)
+	{
+		if (bitReader & a)
+			result += intPow(2, exp) + 1;
+	}
+	return result;
+}
+
 std::pair<long, bool> inputLib::ExtractNextNumber(std::ifstream& input, char& monitorChar)
 {
 	long res = 0;
@@ -93,7 +148,7 @@ std::pair<long, bool> inputLib::ExtractNextNumber(std::ifstream& input, char& mo
 	return std::make_pair(res, false);
 }
 
-std::pair< std::optional<long> , char > inputLib::ExtractNextNumber(std::ifstream& input)
+std::pair< std::optional<long>, char > inputLib::ExtractNextNumber(std::ifstream& input)
 {
 	char monitorChar = input.get();
 	long res = 0;

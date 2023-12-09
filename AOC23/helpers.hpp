@@ -130,6 +130,10 @@ unsigned int secureGetNumber();
 
 int getFileAndPart(int day, std::ifstream* in, unsigned int* part);
 
+std::optional< long long > divisible(long long a, long long b);
+
+long long intPow(long long a, long long b);
+
 namespace inputLib
 {
 

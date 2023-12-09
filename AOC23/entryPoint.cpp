@@ -52,6 +52,9 @@ int main()
 			case 9:
 				err = day9();
 				break;
+			case 10:
+				err = day10();
+				break;
 			default:
 				std::cout << "not implemented yet" << std::endl;
 			}
