@@ -96,5 +96,8 @@
     <Text Include="input9.txt">
       <Filter>inputs</Filter>
     </Text>
+    <Text Include="input10.txt">
+      <Filter>inputs</Filter>
+    </Text>
   </ItemGroup>
 </Project>

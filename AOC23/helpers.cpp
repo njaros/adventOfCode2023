@@ -119,6 +119,7 @@ std::optional< long long > divisible(long long a_, long long b_) /*work in progr
 	{
 		if (bitReader & a)
 			result += intPow(2, exp) + 1;
+		bitReader <<= 1;
 	}
 	return result;
 }

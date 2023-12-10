@@ -29,6 +29,7 @@ Coord& operator+=(Coord& lhs, const Coord& rhs);
 Coord& operator-=(Coord& lhs, const Coord& rhs);
 Coord operator+(const Coord& lhs, const Coord& rhs);
 Coord operator-(const Coord& lhs, const Coord& rhs);
+
 template <class T>
 std::ostream& operator<<(std::ostream& o, const std::vector<T>& v)
 {
@@ -71,7 +72,25 @@ public:
 
 	typedef std::vector<T> line;
 
-	void addBackElt(const T& elt, const T& newLine)
+	void addFrontLine(const line& l)
+	{
+		this->insert(this->begin(), l);
+	}
+
+	void addBackLine(const line& l)
+	{
+		this->push_back(l);
+	}
+
+	Coord addBackElt(const T& elt)
+	{
+		if (this->empty())
+			this->push_back(line());
+		this->back().push_back(elt);
+		return Coord((int)this->back().size() - 1, (int)this->size() - 1);
+	}
+
+	Coord addBackElt(const T& elt, const T& newLine)
 	{
 		if (this->empty())
 			this->push_back(line());
@@ -79,12 +98,14 @@ public:
 			this->push_back(line());
 		else
 			this->back().push_back(elt);
+		return Coord((int)this->back().size() - 1, (int)this->size() - 1);
 	}
 
-	void addBackElt(const T& elt, const T& newLine, const std::set<T>& ignoreSet)
+	Coord addBackElt(const T& elt, const T& newLine, const std::set<T>& ignoreSet)
 	{
 		if (ignoreSet.find(elt) == ignoreSet.end())
-			this->addBackElt(elt, newLine);
+			return this->addBackElt(elt, newLine);
+		return Coord((int)this->back().size() - 1, (int)this->size() - 1);
 	}
 
 	const T& get(const Coord& c) const
@@ -119,7 +140,7 @@ std::ostream& operator<<(std::ostream& o, const Grid<T>& g)
 {
 	for (const std::vector<T>& elt : g)
 	{
-		o << elt;
+		o << elt << std::endl;
 	}
 	return o;
 }
