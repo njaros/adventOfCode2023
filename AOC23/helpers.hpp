@@ -30,6 +30,10 @@ Coord& operator-=(Coord& lhs, const Coord& rhs);
 Coord operator+(const Coord& lhs, const Coord& rhs);
 Coord operator-(const Coord& lhs, const Coord& rhs);
 
+//Distance functions
+
+long manhattanDist(const Coord& a, const Coord& b);
+
 template <class T>
 std::ostream& operator<<(std::ostream& o, const std::vector<T>& v)
 {
@@ -71,15 +75,109 @@ class Grid : public std::vector<std::vector<T>> {
 public:
 
 	typedef std::vector<T> line;
+	typedef std::vector<T> column;
+
+	void addLine(size_t pos, const line& l)
+	{
+		if (pos <= this->size())
+		{
+			this->insert(this->begin() + pos, l);
+		}
+	}
+
+	void addLine(size_t pos, const T& c)
+	{
+		size_t sizeL;
+		line l;
+
+		if (pos <= this->size())
+		{
+			if (pos)
+				sizeL = this->at(pos - 1).size();
+			else
+				sizeL = this->front().size();
+			l.assign(sizeL, c);
+			this->insert(this->begin() + pos, l);
+		}
+	}
 
 	void addFrontLine(const line& l)
 	{
-		this->insert(this->begin(), l);
+		addLine(0, l);
+	}
+
+	void addFrontLine(const T& c)
+	{
+		addLine(0, c);
 	}
 
 	void addBackLine(const line& l)
 	{
 		this->push_back(l);
+	}
+
+	void addBackLine(const T& c)
+	{
+		size_t sizeL;
+		line l;
+
+		if (!this->empty())
+		{
+			sizeL = this->back().size();
+			l.assign(sizeL, c);
+			this->push_back(l);
+		}
+	}
+
+	void addColumn(size_t pos, const column& c)
+	{
+		size_t idx = 0;
+
+		if (c.size() != this->size())
+			throw(std::invalid_argument("column doesn't have same size than the grid."));
+		for (line& l : *this)
+		{
+			if (pos <= l.size())
+			{
+				l.insert(l.begin() + pos, c[idx]);
+			}
+			else
+				l.push_back(c[idx]);
+			++idx;
+		}
+	}
+
+	void addColumn(size_t pos, const T& c)
+	{
+		for (line& l : *this)
+		{
+			if (pos <= l.size())
+			{
+				l.insert(l.begin() + pos, c);
+			}
+			else
+				l.push_back(c);
+		}
+	}
+
+	void addFrontColumn(const column& c)
+	{
+		addColumn(0, c);
+	}
+
+	void addFrontColumn(const T& c)
+	{
+		addColumn(0, c);
+	}
+
+	void addBackColumn(const column& c)
+	{
+		addColumn(~0, c);
+	}
+
+	void addBackColumn(const T& c)
+	{
+		addColumn(~0, c);
 	}
 
 	Coord addBackElt(const T& elt)
@@ -119,6 +217,20 @@ public:
 		return this->at(c.second).at(c.first);
 	}
 
+	std::set<Coord> findAll(const T& elt)
+	{
+		std::set<Coord> found;
+		for (size_t y = 0; y < this->size(); ++y)
+		{
+			for (size_t x = 0; x < this->at(y).size(); ++x)
+			{
+				if (this->at(y).at(x) == elt)
+					found.insert(Coord((int)x, (int)y));
+			}
+		}
+		return found;
+	}
+
 	const T& operator()(const Coord& c) const
 	{
 		return get(c);
@@ -132,6 +244,25 @@ public:
 	T getCopy(const Coord& c) const
 	{
 		return this->at(c.second).at(c.first);
+	}
+
+	bool isRectangle() const
+	{
+		size_t mem;
+		if (this->empty())
+			return false;
+		mem = this->front().size();
+		for (const line& l : *this)
+		{
+			if (l.size() != mem)
+				return false;
+		}
+		return true;
+	}
+
+	bool isSquare() const
+	{
+		return isRectangle() && (this->size() == this->front().size());
 	}
 };
 
@@ -160,7 +291,7 @@ namespace inputLib
 
 	std::pair<long, bool> ExtractNextNumber(std::ifstream& input, char& monitorChar);
 
-	std::pair< std::optional<long> , char> ExtractNextNumber(std::ifstream& input);
+	std::pair< std::optional<long>, char> ExtractNextNumber(std::ifstream& input);
 
 	char goToNextLine(std::ifstream& input, char& monitorChar, unsigned int times = 1);
 

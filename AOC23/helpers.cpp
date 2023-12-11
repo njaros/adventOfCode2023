@@ -39,6 +39,11 @@ std::ostream& operator<<(std::ostream& o, const Coord& c)
 	return o << '(' << c.first << ", " << c.second << ')';
 }
 
+long manhattanDist(const Coord& a, const Coord& b)
+{
+	return (labs(a.first - b.first) + labs(a.second - b.second));
+}
+
 unsigned int secureGetNumber()
 {
 	std::string buffer;
