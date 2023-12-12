@@ -106,7 +106,6 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalOptions>/F 0 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -135,6 +134,7 @@
     <ClCompile Include="day1.cpp" />
     <ClCompile Include="day10.cpp" />
     <ClCompile Include="day11.cpp" />
+    <ClCompile Include="day12.cpp" />
     <ClCompile Include="day2.cpp" />
     <ClCompile Include="day3.cpp" />
     <ClCompile Include="day4.cpp" />
@@ -156,6 +156,7 @@
   <ItemGroup>
     <Text Include="input10.txt" />
     <Text Include="input11.txt" />
+    <Text Include="input12.txt" />
     <Text Include="input2.txt" />
     <Text Include="input3.txt" />
     <Text Include="input4.txt" />

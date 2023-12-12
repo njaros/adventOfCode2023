@@ -82,7 +82,8 @@ int day11()
 	std::set<Coord> galaxies;
 	Grid<char> grid;
 
-	getFileAndPart(11, &input, &part);
+	if (getFileAndPart(11, &input, &part))
+		return errno;
 
 	parse(grid, input);
 	galaxies = grid.findAll('#');
