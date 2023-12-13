@@ -56,10 +56,12 @@ ull dfs(std::string line, std::deque<size_t> numbers, Cache& cache)
 	if (line.size() < sumNbrs(numbers))
 		return 0;
 
-	marge = line.size() - sumNbrs(numbers);
 	findInCache = cache.find(KeyType(line.size(), numbers.size()));
 	if (findInCache != cache.end())
 		return findInCache->second;
+
+
+	marge = line.size() - sumNbrs(numbers);
 
 	nb = numbers.front();
 	idx = 0;
@@ -89,7 +91,7 @@ ull dfs(std::string line, std::deque<size_t> numbers, Cache& cache)
 	}
 
 	numbers.pop_front();
-	range = std::min<size_t>(uknCount - nb, (int)toNotDepasser.value_or(uknCount - nb));
+	range = std::min<size_t>(uknCount - nb, toNotDepasser.value_or(uknCount - nb));
 	range = std::min<size_t>(range, marge);
 	if (numbers.size())
 	{
