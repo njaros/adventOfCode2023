@@ -25,9 +25,9 @@ size_t sumNbrs(const std::deque<size_t>& d)
 	return size;
 }
 
-unsigned long long dfs(std::string line, std::deque<size_t> numbers, Cache& cache)
+ull dfs(std::string line, std::deque<size_t> numbers, Cache& cache)
 {
-	unsigned long long res = 0;
+	ull res = 0;
 	size_t nb;
 	size_t next;
 	size_t uknCount;
@@ -130,9 +130,9 @@ unsigned long long dfs(std::string line, std::deque<size_t> numbers, Cache& cach
 	return res;
 }
 
-unsigned long long solve(std::string& line, unsigned int part)
+ull solve(std::string& line, unsigned int part)
 {
-	unsigned long long res = 0;
+	ull res = 0;
 	std::deque<size_t> numbers;
 	std::deque<size_t> numbersPart2;
 	std::string linePart2;
@@ -180,7 +180,7 @@ int day12()
 	if (getFileAndPart(12, &input, &part))
 		return errno;
 
-	unsigned long long res = 0;
+	ull res = 0;
 	std::string line;
 
 	while (!input.eof())
