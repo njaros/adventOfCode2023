@@ -76,21 +76,29 @@ public:
 
 	typedef std::vector<T> line;
 	typedef std::vector<T> column;
+	typedef std::vector<std::vector<T>> daddy;
 
-	void addLine(size_t pos, const line& l)
+	template < class container >
+	void addLine(size_t pos, const container& c)
 	{
+		typename daddy::iterator it;
+
 		if (pos <= this->size())
 		{
-			this->insert(this->begin() + pos, l);
+			it = this->insert(this->begin() + pos, line());
+			for (const T& elt : c)
+			{
+				it->push_back(elt);
+			}
 		}
 	}
 
-	void addLine(size_t pos, const T& c)
+	void addLine(size_t pos, const T& c) //optimizable
 	{
 		size_t sizeL;
 		line l;
 
-		if (pos <= this->size())
+		if (!this->empty() && pos <= this->size())
 		{
 			if (pos)
 				sizeL = this->at(pos - 1).size();
@@ -101,14 +109,21 @@ public:
 		}
 	}
 
-	void addFrontLine(const line& l)
+	template <class container>
+	void addFrontLine(const container& c)
 	{
-		addLine(0, l);
+		addLine(0, c);
 	}
 
 	void addFrontLine(const T& c)
 	{
 		addLine(0, c);
+	}
+
+	template <class container>
+	void addBackLine(const container& c)
+	{
+		addLine(this->size(), c);
 	}
 
 	void addBackLine(const line& l)
@@ -129,9 +144,10 @@ public:
 		}
 	}
 
-	void addColumn(size_t pos, const column& c)
+	template <class container>
+	void addColumn(size_t pos, const container& c)
 	{
-		size_t idx = 0;
+		typename container::const_iterator it = c.begin();
 
 		if (c.size() != this->size())
 			throw(std::invalid_argument("column doesn't have same size than the grid."));
@@ -139,11 +155,11 @@ public:
 		{
 			if (pos <= l.size())
 			{
-				l.insert(l.begin() + pos, c[idx]);
+				l.insert(l.begin() + pos, *it);
 			}
 			else
-				l.push_back(c[idx]);
-			++idx;
+				l.push_back(*it);
+			++it;
 		}
 	}
 
@@ -206,17 +222,6 @@ public:
 		return Coord((int)this->back().size() - 1, (int)this->size() - 1);
 	}
 
-	const T& get(const Coord& c) const
-	{
-		return this->at(c.second).at(c.first);
-	}
-
-
-	T& get(const Coord& c)
-	{
-		return this->at(c.second).at(c.first);
-	}
-
 	std::set<Coord> findAll(const T& elt)
 	{
 		std::set<Coord> found;
@@ -229,6 +234,31 @@ public:
 			}
 		}
 		return found;
+	}
+
+	const line& getLine(size_t pos) const
+	{
+		return this[pos];
+	}
+
+	const column getcolumn(size_t pos) const
+	{
+		column ret;
+		for (const line& l : *this)
+		{
+			ret.push_back(l[pos]);
+		}
+		return ret;
+	}
+
+	const T& get(const Coord& c) const
+	{
+		return this->at(c.second).at(c.first);
+	}
+
+	T& get(const Coord& c)
+	{
+		return this->at(c.second).at(c.first);
 	}
 
 	const T& operator()(const Coord& c) const
