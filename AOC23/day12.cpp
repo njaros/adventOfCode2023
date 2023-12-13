@@ -1,8 +1,7 @@
 #include "helpers.hpp"
-#include <chrono>
 
-typedef std::pair<std::string::size_type, std::deque<int>::size_type> Comp;
-typedef std::map<Comp, unsigned long long> Cache;
+typedef std::pair<std::string::size_type, std::deque<size_t>::size_type> KeyType;
+typedef std::map<KeyType, ull> Cache;
 
 void trimDots(std::string& line)
 {
@@ -16,24 +15,24 @@ void trimDots(std::string& line)
 	}
 }
 
-int sumNbrs(const std::deque<int>& d)
+size_t sumNbrs(const std::deque<size_t>& d)
 {
-	int size = 0;
-	for (int i : d)
+	size_t size = 0;
+	for (size_t i : d)
 		size += i + 1;
 	if (size)
 		return size - 1;
 	return size;
 }
 
-unsigned long long dfs(std::string line, std::deque<int> numbers, Cache& cache)
+unsigned long long dfs(std::string line, std::deque<size_t> numbers, Cache& cache)
 {
 	unsigned long long res = 0;
-	int nb;
-	int next;
-	int uknCount;
-	int range;
-	int marge;
+	size_t nb;
+	size_t next;
+	size_t uknCount;
+	size_t range;
+	size_t marge;
 	std::string::size_type idx;
 	std::optional<std::string::size_type> toNotDepasser;
 	std::optional<std::string::size_type> toNotEat;
@@ -54,11 +53,11 @@ unsigned long long dfs(std::string line, std::deque<int> numbers, Cache& cache)
 	if (line.empty())
 		return 0;
 
-	marge = (int)line.size() - sumNbrs(numbers);
-	if (marge < 0)
+	if (line.size() < sumNbrs(numbers))
 		return 0;
 
-	findInCache = cache.find(Comp(line.size(), numbers.size()));
+	marge = line.size() - sumNbrs(numbers);
+	findInCache = cache.find(KeyType(line.size(), numbers.size()));
 	if (findInCache != cache.end())
 		return findInCache->second;
 
@@ -85,23 +84,23 @@ unsigned long long dfs(std::string line, std::deque<int> numbers, Cache& cache)
 		res += dfs(line.substr(idx), numbers, cache);
 	if (nb > uknCount)
 	{
-		cache[Comp(line.size(), numbers.size())] = res;
+		cache[KeyType(line.size(), numbers.size())] = res;
 		return res;
 	}
 
 	numbers.pop_front();
-	range = std::min<int>(uknCount - nb, (int)toNotDepasser.value_or(uknCount - nb));
-	range = std::min<int>(range, marge);
+	range = std::min<size_t>(uknCount - nb, (int)toNotDepasser.value_or(uknCount - nb));
+	range = std::min<size_t>(range, marge);
 	if (numbers.size())
 	{
 		next = numbers.front();
 		if (!toNotDepasser.has_value() && next + nb + 1 > uknCount)
 		{
 			if (uknCount < line.size())
-				res += ((range + 1) * dfs(line.substr(uknCount), numbers, cache));
+				res += ((ull)(range + 1) * dfs(line.substr(uknCount), numbers, cache));
 			else
-				res += ((range + 1) * dfs("", numbers, cache));
-			cache[Comp(line.size(), numbers.size() + 1)] = res;
+				res += ((ull)(range + 1) * dfs("", numbers, cache));
+			cache[KeyType(line.size(), numbers.size() + 1)] = res;
 			return res;
 		}
 	}
@@ -118,8 +117,8 @@ unsigned long long dfs(std::string line, std::deque<int> numbers, Cache& cache)
 					next = numbers.front();
 					if (next + nb + 1 > uknCount - i && toNotEat.value_or(0) < i + nb)
 					{
-						res += ((range - i + 1) * dfs(line.substr(uknCount), numbers, cache));
-						cache[Comp(line.size(), numbers.size() + 1)] = res;
+						res += ((ull)(range - i + 1) * dfs(line.substr(uknCount), numbers, cache));
+						cache[KeyType(line.size(), numbers.size() + 1)] = res;
 						return res;
 					}
 				}
@@ -127,15 +126,15 @@ unsigned long long dfs(std::string line, std::deque<int> numbers, Cache& cache)
 			}
 		}
 	}
-	cache[Comp(line.size(), numbers.size() + 1)] = res;
+	cache[KeyType(line.size(), numbers.size() + 1)] = res;
 	return res;
 }
 
 unsigned long long solve(std::string& line, unsigned int part)
 {
 	unsigned long long res = 0;
-	std::deque<int> numbers;
-	std::deque<int> numbersPart2;
+	std::deque<size_t> numbers;
+	std::deque<size_t> numbersPart2;
 	std::string linePart2;
 	std::string::size_type idx = 0;
 	std::string::iterator it = line.begin();

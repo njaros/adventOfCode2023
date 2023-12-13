@@ -17,9 +17,11 @@
 #include <iomanip>
 #include <unordered_map>
 #include <unordered_set>
+#include <bitset>
 
 //Usefull typedefs
 
+typedef unsigned long long ull;
 typedef std::pair<int, int> Coord;
 typedef std::pair<long, bool> NumberRead;
 
