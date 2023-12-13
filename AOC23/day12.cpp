@@ -90,7 +90,7 @@ unsigned long long dfs(std::string line, std::deque<int> numbers, Cache& cache)
 	}
 
 	numbers.pop_front();
-	range = std::min<int>(uknCount - nb, toNotDepasser.value_or(uknCount - nb));
+	range = std::min<int>(uknCount - nb, (int)toNotDepasser.value_or(uknCount - nb));
 	range = std::min<int>(range, marge);
 	if (numbers.size())
 	{
