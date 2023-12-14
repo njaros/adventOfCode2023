@@ -21,6 +21,7 @@
 
 //Usefull typedefs
 
+typedef unsigned int ui;
 typedef unsigned long long ull;
 typedef std::pair<int, int> Coord;
 typedef std::pair<long, bool> NumberRead;
@@ -74,11 +75,55 @@ std::ostream& operator<<(std::ostream& o, const std::map<T, U>& m)
 template <class T>
 class Grid : public std::vector<std::vector<T>> {
 
+
+	/*
+	* isOk :
+	* #####
+	* ###
+	* #
+	* #
+	*
+	* isNotOk :
+	*
+	* ##
+	* ####
+	* ########
+	*
+	*/
+	bool _isColumnBrowsable() const
+	{
+		if (this->empty() || this->front().empty())
+			return false;
+		typename line::size_type prev = this->front().size();
+		for (const line& l : *this)
+		{
+			if (l.size() > prev)
+				return false;
+			prev = l.size();
+		}
+		return true;
+	}
+
+	bool _isReverseColumnBrowsable() const
+	{
+		if (this->empty() || this->back().empty())
+			return false;
+		typename line::size_type prev = this->back().size();
+		for (typename daddy::size_type idx = this->size() - 1; idx != ~0; --idx)
+		{
+			if ((*this)[idx].size() > prev)
+				return false;
+			prev = (*this)[idx].size();
+		}
+		return true;
+	}
+
 public:
 
 	typedef std::vector<T> line;
 	typedef std::vector<T> column;
 	typedef std::vector<std::vector<T>> daddy;
+	typedef std::optional< std::tuple< Coord, bool, T* > > browser;
 
 	template < class container >
 	void addLine(size_t pos, const container& c)
@@ -273,9 +318,62 @@ public:
 		return get(c);
 	}
 
+	T* getPtr(const Coord& c)
+	{
+		return &(get(c));
+	}
+
 	T getCopy(const Coord& c) const
 	{
 		return this->at(c.second).at(c.first);
+	}
+
+	// Tools to "easily" browse the grid
+
+	browser columnBrowse(const browser& current)
+	{
+		typename line::size_type max;
+		Coord nextCoord;
+
+		if (!_isColumnBrowsable())
+			return std::nullopt;
+
+		nextCoord = Coord(0, 0);
+		max = this->front().size();
+		if (!current.has_value())
+			return std::make_tuple(nextCoord, 1, getPtr(nextCoord));
+
+		nextCoord = std::get<0>(current.value()) + Coord(0, 1);
+		if (nextCoord.second >= this->size() || nextCoord.second >= (*this)[nextCoord.second].size())
+		{
+			nextCoord = Coord(std::get<0>(current.value()).first + 1, 0);
+			if (nextCoord.first >= max)
+				return std::nullopt;
+			return std::make_tuple(nextCoord, 1, getPtr(nextCoord));
+		}
+		return std::make_tuple(nextCoord, 0, getPtr(nextCoord));
+	}
+
+	browser columnBrowseReverse(const browser& current)
+	{
+		Coord nextCoord;
+
+		if (!_isReverseColumnBrowsable())
+			return std::nullopt;
+
+		nextCoord = Coord((int)this->back().size() - 1, (int)this->size() - 1);
+		if (!current.has_value())
+			return std::make_tuple(nextCoord, 1, getPtr(nextCoord));
+
+		nextCoord = std::get<0>(current.value()) + Coord(0, -1);
+		if (nextCoord.second < 0)
+		{
+			nextCoord = Coord(std::get<0>(current.value()).first - 1, (int)this->size() - 1);
+			if (nextCoord.first < 0)
+				return std::nullopt;
+			return std::make_tuple(nextCoord, 1, getPtr(nextCoord));
+		}
+		return std::make_tuple(nextCoord, 0, getPtr(nextCoord));
 	}
 
 	bool isRectangle() const
