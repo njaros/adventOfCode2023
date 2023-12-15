@@ -205,7 +205,7 @@ void manageNextTodos(const Todos& todo, Todos& todoNext, RangeSet& match, RangeS
 	}
 }
 
-unsigned long part2(std::ifstream& input)
+static unsigned long part2(std::ifstream& input)
 {
 	unsigned long res = ~0;
 	unsigned long sourceMin;

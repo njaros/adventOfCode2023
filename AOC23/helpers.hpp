@@ -37,8 +37,25 @@ Coord operator-(const Coord& lhs, const Coord& rhs);
 
 long manhattanDist(const Coord& a, const Coord& b);
 
+template <class T, class U>
+std::ostream& operator<<(std::ostream& o, const std::pair<T, U>& p)
+{
+	o << p.first << " : " << p.second;
+	return o;
+}
+
 template <class T>
 std::ostream& operator<<(std::ostream& o, const std::vector<T>& v)
+{
+	for (const T& elt : v)
+	{
+		o << elt;
+	}
+	return o;
+}
+
+template <class T>
+std::ostream& operator<<(std::ostream& o, const std::deque<T>& v)
 {
 	for (const T& elt : v)
 	{
