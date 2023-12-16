@@ -100,7 +100,6 @@ static void solve(std::ifstream& input)
 int day15()
 {
     std::ifstream input;
-    ui part;
     std::string line;
 
     if (getFileAndPart(15, &input, 0))

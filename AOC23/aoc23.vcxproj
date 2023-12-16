@@ -122,6 +122,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -131,6 +132,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Beam.cpp" />
     <ClCompile Include="day1.cpp" />
     <ClCompile Include="day10.cpp" />
     <ClCompile Include="day11.cpp" />
@@ -138,6 +140,7 @@
     <ClCompile Include="day13.cpp" />
     <ClCompile Include="day14.cpp" />
     <ClCompile Include="day15.cpp" />
+    <ClCompile Include="day16.cpp" />
     <ClCompile Include="day2.cpp" />
     <ClCompile Include="day3.cpp" />
     <ClCompile Include="day4.cpp" />
@@ -148,13 +151,16 @@
     <ClCompile Include="day9.cpp" />
     <ClCompile Include="entryPoint.cpp" />
     <ClCompile Include="helpers.cpp" />
+    <ClCompile Include="Tile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="input1.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Beam.hpp" />
     <ClInclude Include="Days.hpp" />
     <ClInclude Include="helpers.hpp" />
+    <ClInclude Include="Tile.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="input10.txt" />
@@ -163,6 +169,7 @@
     <Text Include="input13.txt" />
     <Text Include="input14.txt" />
     <Text Include="input15.txt" />
+    <Text Include="input16.txt" />
     <Text Include="input2.txt" />
     <Text Include="input3.txt" />
     <Text Include="input4.txt" />

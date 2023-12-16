@@ -72,12 +72,27 @@
     <ClCompile Include="day15.cpp">
       <Filter>Fichiers sources\days</Filter>
     </ClCompile>
+    <ClCompile Include="day16.cpp">
+      <Filter>Fichiers sources\days</Filter>
+    </ClCompile>
+    <ClCompile Include="Tile.cpp">
+      <Filter>Fichiers sources\days</Filter>
+    </ClCompile>
+    <ClCompile Include="Beam.cpp">
+      <Filter>Fichiers sources\days</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="helpers.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="Days.hpp">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="Tile.hpp">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="Beam.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>
@@ -127,6 +142,9 @@
       <Filter>inputs</Filter>
     </Text>
     <Text Include="input15.txt">
+      <Filter>inputs</Filter>
+    </Text>
+    <Text Include="input16.txt">
       <Filter>inputs</Filter>
     </Text>
   </ItemGroup>
