@@ -3,7 +3,7 @@
 typedef std::pair< std::string, int > Lens;
 typedef std::deque< Lens > Box;
 
-unsigned short myHash(const std::string& str)
+static unsigned short myHash(const std::string& str)
 {
 	unsigned char ret;
 
@@ -17,33 +17,7 @@ unsigned short myHash(const std::string& str)
 	return ret;
 }
 
-static void part1(std::ifstream& input)
-{
-	ull res;
-	char c;
-	std::string line;
-
-	res = 0;
-	c = input.get();
-	while (c != EOF)
-	{
-		if (c == ',')
-		{
-			res += myHash(line);
-			line.clear();
-		}
-		else
-		{
-			line += c;
-		}
-		c = input.get();
-	}
-	res += myHash(line);
-
-	std::cout << "result is " << res << std::endl;
-}
-
-void parseElt(Box* boxes, const std::string& str)
+static void parseElt(Box* boxes, const std::string& str)
 {
 	char c;
 	unsigned short hash;
@@ -75,7 +49,7 @@ void parseElt(Box* boxes, const std::string& str)
 	throw (std::invalid_argument("bad input."));
 }
 
-static void part2(std::ifstream& input)
+static void solve(std::ifstream& input)
 {
 	ull res;
 	char c;
@@ -91,6 +65,7 @@ static void part2(std::ifstream& input)
 		if (c == ',')
 		{
 			parseElt(boxes, line);
+			res += myHash(line);
 			line.clear();
 		}
 		else
@@ -100,6 +75,9 @@ static void part2(std::ifstream& input)
 		c = input.get();
 	}
 	parseElt(boxes, line);
+	res += myHash(line);
+
+	std::cout << "Part1 result is " << res << std::endl;
 
 	res = 0;
 	idxBox = 0;
@@ -116,24 +94,19 @@ static void part2(std::ifstream& input)
 			}
 		}
 	}
-	std::cout << "result is " << res << std::endl;
+	std::cout << "Part2 result is " << res << std::endl;
 }
 
 int day15()
 {
     std::ifstream input;
     ui part;
-    ull res;
-	char c;
     std::string line;
 
-    if (getFileAndPart(15, &input, &part))
+    if (getFileAndPart(15, &input, 0))
         return errno;
 
-	if (part == 1)
-		part1(input);
-	else
-		part2(input);
+	solve(input);
 
     return 0;
 }
