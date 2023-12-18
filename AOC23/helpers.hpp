@@ -144,6 +144,11 @@ public:
 	typedef std::vector<std::vector<T>> daddy;
 	typedef std::optional< std::tuple< Coord, bool, T* > > browser;
 
+	void addEmptyLine()
+	{
+		this->push_back(line());
+	}
+
 	template < class container >
 	void addLine(size_t pos, const container& c)
 	{
@@ -273,9 +278,9 @@ public:
 	Coord addBackElt(const T& elt, const T& newLine)
 	{
 		if (this->empty())
-			this->push_back(line());
+			addEmptyLine();
 		if (elt == newLine)
-			this->push_back(line());
+			addEmptyLine();
 		else
 			this->back().push_back(elt);
 		return Coord((int)this->back().size() - 1, (int)this->size() - 1);
@@ -395,6 +400,15 @@ public:
 		return std::make_tuple(nextCoord, 0, getPtr(nextCoord));
 	}
 
+	bool inBounds(Coord c) const
+	{
+		if (c.second < 0 || c.first < 0)
+			return false;
+		if (c.second >= this->size() || c.first >= (*this)[c.second].size())
+			return false;
+		return true;
+	}
+
 	bool isRectangle() const
 	{
 		size_t mem;
@@ -434,6 +448,11 @@ int getFileAndPart(int day, std::ifstream* in, unsigned int* part);
 std::optional< long long > divisible(long long a, long long b);
 
 long long intPow(long long a, long long b);
+
+namespace math
+{
+	ui ManhattanDist(const Coord& a, const Coord& b);
+}
 
 namespace inputLib
 {

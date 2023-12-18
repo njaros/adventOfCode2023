@@ -81,6 +81,9 @@
     <ClCompile Include="Beam.cpp">
       <Filter>Fichiers sources\days</Filter>
     </ClCompile>
+    <ClCompile Include="day17.cpp">
+      <Filter>Fichiers sources\days</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="helpers.hpp">
@@ -145,6 +148,9 @@
       <Filter>inputs</Filter>
     </Text>
     <Text Include="input16.txt">
+      <Filter>inputs</Filter>
+    </Text>
+    <Text Include="input17.txt">
       <Filter>inputs</Filter>
     </Text>
   </ItemGroup>

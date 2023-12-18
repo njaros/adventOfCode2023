@@ -142,6 +142,11 @@ std::optional< long long > divisible(long long a_, long long b_) /*work in progr
 	return result;
 }
 
+ui math::ManhattanDist(const Coord& a, const Coord& b)
+{
+	return (labs(a.first - b.first) + labs(a.second - b.second));
+}
+
 std::pair<long, bool> inputLib::ExtractNextNumber(std::ifstream& input, char& monitorChar)
 {
 	long res = 0;
