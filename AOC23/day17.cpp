@@ -9,6 +9,7 @@
 typedef std::map< int, ui > Pouet;
 typedef std::map< int, Pouet > DirScores;
 typedef std::map< Coord, DirScores > Cache; //empecheur de tourner en rond
+typedef std::map< Coord, ui > Cache2;
 
 void addDir(Coord& c, int dir)
 {
@@ -64,7 +65,7 @@ static int opposite(int dir)
 	return NONE;
 }
 
-static class Node
+class Node
 {
 
 	Node() : _value(0), _cost(0), _dir(NONE), _dirCount(0), _parent(0)
@@ -109,7 +110,7 @@ public:
 typedef std::multimap<int, Node*> openType;
 typedef std::map<Coord, Node*> closeType;
 
-static class AStar
+class AStar
 {
 	//Coplien not to use
 	AStar() {}
@@ -290,15 +291,16 @@ static void printPath(Grid<int> m, const std::vector<Coord>& v)
 	}
 }
 
-static void dfs(const Grid<int>& m, Coord& current, int dirCount, int prevDir, ui score, ui& bestScore, Cache& cache, std::vector< Coord >& path)
+static void dfs(const Grid<int>& m, Coord& current, int dirCount, int prevDir, ui score, ui& bestScore, Cache2& cache, std::vector< Coord >& path)
 {
 	Pouet::const_iterator pcit;
 	DirScores::const_iterator dcit;
-	Cache::const_iterator cit;
+	//Cache::const_iterator cit;
+	Cache2::const_iterator cit;
 	std::deque< int > order;
 	int memDirCount;
 
-	if (score + (2.5 * math::ManhattanDist(current, Coord((int)m.back().size() - 1, (int)m.size() - 1))) >= bestScore)
+	if (score + (math::ManhattanDist(current, Coord((int)m.back().size() - 1, (int)m.size() - 1))) >= bestScore)
 		return;
 	if (current.first == m.back().size() - 1 && current.second == m.size() - 1)
 	{
@@ -307,7 +309,7 @@ static void dfs(const Grid<int>& m, Coord& current, int dirCount, int prevDir, u
 	//	printPath(m, path);
 		return;
 	}
-	cit = cache.find(current);
+	/*cit = cache.find(current);
 	if (cit != cache.end())
 	{
 		dcit = cit->second.find(prevDir);
@@ -322,7 +324,13 @@ static void dfs(const Grid<int>& m, Coord& current, int dirCount, int prevDir, u
 			}
 		}
 	}
-	cache[current][prevDir][dirCount] = score;
+	cache[current][prevDir][dirCount] = score;*/
+	cit = cache.find(current);
+	if (cit != cache.end() && cit->second < score)
+	{
+		return;
+	}
+	cache[current] = score;
 	setOrder(order, m, current);
 	for (int side : order)
 	{
@@ -351,14 +359,14 @@ static void solve(const Grid<int>& m, ui part)
 {
 	Coord start(0, 0);
 	std::vector< Coord > path;
-	Cache cache;
+	Cache2 cache;
 	ui res(1011);
 
 	dfs(m, start, 0, NONE, 0, res, cache, path);
 	std::cout << "result is " << res << std::endl;
 }
 
-int day17()
+int main()
 {
 	std::ifstream input;
 	ui part;
