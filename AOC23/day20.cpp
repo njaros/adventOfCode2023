@@ -74,7 +74,7 @@ struct Network
 	NetNode entryPoint;
 };
 
-int main()
+int day20()
 {
 	std::ifstream input;
 	ui part;

@@ -11,7 +11,7 @@ typedef std::map< int, Pouet > DirScores;
 typedef std::map< Coord, DirScores > Cache; //empecheur de tourner en rond
 typedef std::map< Coord, ui > Cache2;
 
-void addDir(Coord& c, int dir)
+static void addDir(Coord& c, int dir)
 {
 	switch (dir)
 	{
@@ -30,7 +30,7 @@ void addDir(Coord& c, int dir)
 	}
 }
 
-void substractDir(Coord& c, int dir)
+static void substractDir(Coord& c, int dir)
 {
 	switch (dir)
 	{
@@ -94,7 +94,12 @@ public:
 			throw(std::domain_error("dir > 3 one Node constructor."));
 		_value = _cost + heuristicValue;
 	}
-	Node(const Node& other) : _pos(other._pos), _value(other._value), _cost(other._cost), _parent(other._parent)
+	Node(const Node& other) : _pos(other._pos),
+		_value(other._value),
+		_cost(other._cost),
+		_dir(other._dir),
+		_dirCount(other._dirCount),
+		_parent(other._parent)
 	{}
 	~Node() {}
 	Node& operator=(const Node& other)
@@ -102,13 +107,44 @@ public:
 		_pos = other._pos;
 		_value = other._value;
 		_cost = other._cost;
+		_dir = other._dir;
+		_dirCount = other._dirCount;
 		_parent = other._parent;
 		return (*this);
 	}
 };
 
+bool operator==(const Node& a, const Node& b) {
+	return a._cost == b._cost && a._dir == b._dir && a._dirCount == b._dirCount && a._pos == b._pos && a._value == b._value;
+}
+
+bool operator!=(const Node& a,const Node& b) {
+	return !(a == b);
+}
+
+bool operator<(const Node& a, const Node& b) {
+	if (a._cost < b._cost)
+		return true;
+	if (a._cost > b._cost)
+		return false;
+	if (a._pos < b._pos)
+		return true;
+	if (a._pos > b._pos)
+		return false;
+	if (a._dir < b._dir)
+		return true;
+	if (a._dir > b._dir)
+		return false;
+	return a._dirCount < b._dirCount;
+}
+
+std::ostream& operator<<(std::ostream& o, const Node& n)
+{
+	return o << "cost: " << n._cost << ", pos: " << n._pos << ", dir: " << n._dir << ", dirCount: " << n._dirCount << ", value: " << n._value << '\n';
+}
+
 typedef std::multimap<int, Node*> openType;
-typedef std::map<Coord, Node*> closeType;
+typedef std::multimap<Coord, Node*> closeType;
 
 class AStar
 {
@@ -119,24 +155,40 @@ class AStar
 	//End of Coplien not to use
 
 	//Member's data
-	openType				_open;
-	closeType				_close;
-	std::set<Coord>			_secureFreeTool;
-	std::map<Coord, int>	_zone;
-	Coord					_start;
-	Coord					_end;
-	bool					_endReached;
-	Node*					_current;
+	openType					_open;
+	closeType					_close;
+	std::unordered_set<Node *>	_secureFreeTool;
+	std::map<Coord, int>		_zone;
+	Coord						_start;
+	Coord						_end;
+	bool						_endReached;
+	Node*						_current;
+	std::set<Node>				_duplicateDetector;
 
 	//Private tool functions
 
 	bool _dirNotAllowed(int dir)
 	{
 		if (dir == opposite(_current->_dir))
-			return false;
+			return true;
 		if (dir == _current->_dir && _current->_dirCount == 3)
-			return false;
-		return true;
+			return true;
+		return false;
+	}
+
+	openType::iterator _insertToOpen(Node *n) {
+		if (_duplicateDetector.insert(*n).second)
+		{
+			// if (_duplicateDetector.size() == 10000)
+				// std::cout << _duplicateDetector << '\n';
+			return _open.insert(std::make_pair(n->_value, n));
+		}
+		else
+		{
+			// std::cout << "duplicate \n";
+			delete n;
+		}
+		return _open.end();
 	}
 
 	void _checkSide(int dir)
@@ -151,20 +203,31 @@ class AStar
 		if (zoneIt != _zone.end()) // check if I'm out of border + if the height is too big
 		{
 			//	std::cout << newVal << '\n';
-			closeType::iterator	found = _close.find(_current->_pos);
-			if (found != _close.end())
+			Node* newNode = new Node(newCoord, _current, newVal, zoneIt->second, dir);
+			closeType::iterator	found = _close.find(newNode->_pos);
+			if (found != _close.end()
+				&& found->second->_dir == newNode->_dir)
 			{
-				if (found->second->_value > newVal + zoneIt->second + _current->_cost)
+				if (found->second->_dirCount <= newNode->_dirCount
+					&& found->second->_value <= newNode->_value)
+					{
+						delete newNode;
+						return;
+					}
+				if (found->second->_dirCount >= newNode->_dirCount
+					&& found->second->_value > newVal + zoneIt->second + newNode->_cost)
 				{
-					Node* newNode = new Node(newCoord, _current, newVal, zoneIt->second, dir);
-					_open.insert(std::make_pair(newNode->_value, newNode));
+					_insertToOpen(newNode);
+					delete found->second;
 					_close.erase(found);
+				}
+				else {
+					_insertToOpen(newNode);
 				}
 			}
 			else
 			{
-				Node* newNode = new Node(newCoord, _current, newVal, zoneIt->second, dir);
-				_open.insert(std::make_pair(newNode->_value, newNode));
+				_insertToOpen(newNode);
 			}
 		}
 	}
@@ -175,17 +238,21 @@ public:
 		_endReached(false)
 	{
 		Node* newNode = new Node(_start, NULL, math::ManhattanDist(start, end), 0, NONE);
+		std::cout << newNode->_cost << " | " << newNode->_pos << " | " << newNode->_value << '\n';
+		ui dist;
 		_open.insert(std::make_pair(newNode->_value, newNode));
 		_current = _open.begin()->second;
 		while (!_open.empty() && !_endReached)
 		{
+			_open.erase(_open.begin());
+			_close.insert(std::make_pair(_current->_pos, _current));
 			_checkSide(LEFT);
 			_checkSide(UP);
 			_checkSide(DOWN);
 			_checkSide(RIGHT);
-			std::pair<closeType::iterator, bool> res = _close.insert(std::make_pair(_open.begin()->second->_pos, _open.begin()->second));
-			_open.erase(_open.begin());
-			if (!math::ManhattanDist(_current->_pos, end))
+			dist = math::ManhattanDist(_current->_pos, end);
+			std::cout << dist << " | " << *_current << '\n';
+			if (!dist)
 				_endReached = true;
 			if (!_open.empty() && !_endReached)
 				_current = _open.begin()->second;
@@ -196,12 +263,12 @@ public:
 	{
 		for (openType::iterator it = _open.begin(); it != _open.end(); ++it)
 		{
-			_secureFreeTool.insert(it->second->_pos);
+			_secureFreeTool.insert(it->second);
 			delete (it->second);
 		}
 		for (closeType::iterator it = _close.begin(); it != _close.end(); ++it)
 		{
-			if (_secureFreeTool.find(it->first) == _secureFreeTool.end())
+			if (_secureFreeTool.find(it->second) == _secureFreeTool.end())
 				delete (it->second);
 		}
 	}
@@ -224,57 +291,6 @@ public:
 
 };
 
-static void setOrder(std::deque< int >& o, const Grid< int >& m, Coord c)
-{
-	int a = 0;
-	c.first += 1;
-	if (m.inBounds(c))
-		a = m(c);
-	c.first -= 1;
-	c.second += 1;
-	if (m.inBounds(c))
-	{
-		if (!a)
-			o.push_back(DOWN);
-		else if (a <= m(c))
-		{
-			o.push_back(RIGHT);
-			o.push_back(DOWN);
-		}
-		else
-		{
-			o.push_back(DOWN);
-			o.push_back(RIGHT);
-		}
-	}
-	else if (a)
-		o.push_back(RIGHT);
-	c.second -= 1;
-	a = 0;
-	c.first -= 1;
-	if (m.inBounds(c))
-		a = m(c);
-	c.first += 1;
-	c.second -= 1;
-	if (m.inBounds(c))
-	{
-		if (!a)
-			o.push_back(UP);
-		else if (a <= m(c))
-		{
-			o.push_back(LEFT);
-			o.push_back(UP);
-		}
-		else
-		{
-			o.push_back(UP);
-			o.push_back(LEFT);
-		}
-	}
-	else if (a)
-		o.push_back(LEFT);
-}
-
 static void printPath(Grid<int> m, const std::vector<Coord>& v)
 {
 	for (Coord f : v)
@@ -291,86 +307,26 @@ static void printPath(Grid<int> m, const std::vector<Coord>& v)
 	}
 }
 
-static void dfs(const Grid<int>& m, Coord& current, int dirCount, int prevDir, ui score, ui& bestScore, Cache2& cache, std::vector< Coord >& path)
-{
-	Pouet::const_iterator pcit;
-	DirScores::const_iterator dcit;
-	//Cache::const_iterator cit;
-	Cache2::const_iterator cit;
-	std::deque< int > order;
-	int memDirCount;
-
-	if (score + (math::ManhattanDist(current, Coord((int)m.back().size() - 1, (int)m.size() - 1))) >= bestScore)
-		return;
-	if (current.first == m.back().size() - 1 && current.second == m.size() - 1)
-	{
-		bestScore = score;
-		std::cout << bestScore << std::endl;
-	//	printPath(m, path);
-		return;
-	}
-	/*cit = cache.find(current);
-	if (cit != cache.end())
-	{
-		dcit = cit->second.find(prevDir);
-		if (dcit != cit->second.end())
-		{
-			pcit = dcit->second.begin();
-			while (pcit != dcit->second.end())
-			{
-				if (pcit->first <= dirCount && pcit->second < score)
-					return;
-				++pcit;
-			}
-		}
-	}
-	cache[current][prevDir][dirCount] = score;*/
-	cit = cache.find(current);
-	if (cit != cache.end() && cit->second < score)
-	{
-		return;
-	}
-	cache[current] = score;
-	setOrder(order, m, current);
-	for (int side : order)
-	{
-		if (prevDir != opposite(side) && (prevDir != side || dirCount < 3))
-		{
-			if (prevDir != side)
-			{
-				memDirCount = dirCount;
-				dirCount = 0;
-			}
-			++dirCount;
-			addDir(current, side);
-			path.push_back(current);
-			dfs(m, current, dirCount, side, score + m(current), bestScore, cache, path);
-			path.pop_back();
-			substractDir(current, side);
-			if (prevDir != side)
-				dirCount = memDirCount;
-			else
-				--dirCount;
-		}
-	}
-}
-
-static void solve(const Grid<int>& m, ui part)
+static void solve(const std::map<Coord, int>& m, ui part)
 {
 	Coord start(0, 0);
-	std::vector< Coord > path;
-	Cache2 cache;
-	ui res(1011);
+	Coord end(140, 140);
+	// std::vector< Coord > path;
+	// Cache2 cache;
+	// ui res(1011);
+	AStar a(m, start, end);
 
-	dfs(m, start, 0, NONE, 0, res, cache, path);
-	std::cout << "result is " << res << std::endl;
+	std::cout << a.stepCount();
+	// dfs(m, start, 0, NONE, 0, res, cache, path);
+	// std::cout << "result is " << res << std::endl;
 }
 
 int main()
 {
 	std::ifstream input;
 	ui part;
-	Grid<int> map;
+	std::map<Coord, int> map;
+	Coord current(-1, 0);
 	char c;
 
 	if (getFileAndPart(17, &input, &part))
@@ -379,9 +335,15 @@ int main()
 	while (c != EOF)
 	{
 		if (c == '\n')
-			map.addEmptyLine();
+		{
+			current.first = 0;
+			current.second += 1;
+			c = input.get();
+		}
 		else
-			map.addBackElt(c - '0');
+			current.first += 1;
+		map[current] = c - '0';
+		// std::cout << current << " | " << c - '0' << '\n';
 		c = input.get();
 	}
 

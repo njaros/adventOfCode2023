@@ -5,7 +5,7 @@
 #define DOWN 3
 #define UP 4
 
-void addDir(Coord& c, int dir)
+static void addDir(Coord& c, int dir)
 {
 	switch (dir)
 	{
@@ -24,7 +24,7 @@ void addDir(Coord& c, int dir)
 	}
 }
 
-void substractDir(Coord& c, int dir)
+static void substractDir(Coord& c, int dir)
 {
 	switch (dir)
 	{
@@ -239,7 +239,7 @@ void solve2(std::ifstream& input)
 	std::cout << "result is " << res << std::endl;
 }
 
-int main()
+int day18()
 {
 	std::ifstream input;
 	ui part;
