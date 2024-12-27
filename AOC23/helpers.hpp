@@ -1,8 +1,12 @@
+//
+// Created by njaros on 12/4/23.
+//
+
 #ifndef HELPERS_HPP
 #define HELPERS_HPP
-#pragma warning(disable: 4996)
 
 #include <iostream>
+#include <initializer_list>
 #include <fstream>
 #include <string>
 #include <cstring>
@@ -11,19 +15,23 @@
 #include <tuple>
 #include <map>
 #include <set>
+#include <list>
 #include <vector>
 #include <deque>
 #include <optional>
 #include <iomanip>
 #include <unordered_map>
 #include <unordered_set>
+#include <queue>
 #include <bitset>
+#include "Matrix.hpp"
 
 //Usefull typedefs
 
 typedef unsigned int ui;
 typedef unsigned long long ull;
-typedef std::pair<int, int> Coord;
+typedef long long ll;
+typedef std::pair<long long, long long> Coord;
 typedef std::pair<long, bool> NumberRead;
 
 //Some << overloads
@@ -34,6 +42,11 @@ Coord operator+(const Coord& lhs, const Coord& rhs);
 Coord operator-(const Coord& lhs, const Coord& rhs);
 Coord& operator*=(Coord& c, int i);
 Coord operator*(const Coord& c, int i);
+Coord& operator/=(Coord& c, int i);
+Coord operator/(const Coord& c, int i);
+
+template <class T>
+std::ostream& operator<<(std::ostream& o, const std::set<T>& s);
 
 //Distance functions
 
@@ -42,7 +55,7 @@ long manhattanDist(const Coord& a, const Coord& b);
 template <class T, class U>
 std::ostream& operator<<(std::ostream& o, const std::pair<T, U>& p)
 {
-	o << p.first << " : " << p.second;
+	o << p.first << " | " << p.second;
 	return o;
 }
 
@@ -51,7 +64,7 @@ std::ostream& operator<<(std::ostream& o, const std::vector<T>& v)
 {
 	for (const T& elt : v)
 	{
-		o << elt;
+		o << elt << ' ';
 	}
 	return o;
 }
@@ -76,6 +89,17 @@ std::ostream& operator<<(std::ostream& o, const std::set<T>& s)
 	return o;
 }
 
+template <class T>
+std::ostream& operator<<(std::ostream& o, const std::list<T>& l)
+{
+	for (typename std::list<T>::const_iterator cit = l.begin(); cit != l.end(); ++cit)
+	{
+		o << *cit << ' ';
+	}
+	return o;
+}
+
+
 std::ostream& operator<<(std::ostream& o, const Coord& c);
 
 template <class T, class U>
@@ -83,7 +107,7 @@ std::ostream& operator<<(std::ostream& o, const std::map<T, U>& m)
 {
 	for (typename std::map<T, U>::const_iterator cit = m.begin(); cit != m.end(); ++cit)
 	{
-		o << cit->first << " | " << cit->second << std::endl;
+		o << cit->first << "-> " << cit->second << '\n';
 	}
 	return o;
 }
@@ -143,6 +167,15 @@ public:
 	typedef std::vector<T> column;
 	typedef std::vector<std::vector<T>> daddy;
 	typedef std::optional< std::tuple< Coord, bool, T* > > browser;
+
+	Grid(): daddy() {}
+
+	Grid(const std::initializer_list<std::initializer_list<T>> &il) {
+		typedef typename std::initializer_list<std::initializer_list<T> > Kinilist;
+		for (typename Kinilist::const_iterator cit = il.begin(); cit != il.end(); ++cit) {
+			this->push_back(line(*cit));
+		}
+	}
 
 	void addEmptyLine()
 	{
@@ -213,6 +246,10 @@ public:
 			l.assign(sizeL, c);
 			this->push_back(l);
 		}
+	}
+
+	void appendInLastLine(const T& elt) {
+		this->back().push_back(elt);
 	}
 
 	template <class container>
@@ -293,7 +330,27 @@ public:
 		return Coord((int)this->back().size() - 1, (int)this->size() - 1);
 	}
 
-	std::set<Coord> findAll(const T& elt)
+	void swapCells(Coord a, Coord b) {
+		T tmp = this->get(a);
+		this->get(a) = this->get(b);
+		this->get(b) = tmp;
+	}
+
+	std::optional<Coord> findOne(const T& elt) const
+	{
+		for (size_t y = 0; y < this->size(); ++y)
+		{
+			for (size_t x = 0; x < this->at(y).size(); ++x)
+			{
+				if (this->at(y).at(x) == elt) {
+					return Coord((int)x, (int)y);
+				}
+			}
+		}
+		return std::nullopt;
+	}
+
+	std::set<Coord> findAll(const T& elt) const
 	{
 		std::set<Coord> found;
 		for (size_t y = 0; y < this->size(); ++y)
@@ -332,6 +389,12 @@ public:
 		return this->at(c.second).at(c.first);
 	}
 
+	template <class container>
+	void insertElems(const container& cont, const T& elem) {
+		for (typename container::const_iterator cit = cont.begin(); cit != cont.end(); ++cit)
+			get(*cit) = elem;
+	}
+
 	const T& operator()(const Coord& c) const
 	{
 		return get(c);
@@ -368,9 +431,9 @@ public:
 			return std::make_tuple(nextCoord, 1, getPtr(nextCoord));
 
 		nextCoord = std::get<0>(current.value()) + Coord(0, 1);
-		if (nextCoord.second >= this->size() || nextCoord.second >= (*this)[nextCoord.second].size())
+		if (nextCoord.second >= this->size() || nextCoord.first >= (*this)[nextCoord.second].size())
 		{
-			nextCoord = Coord(std::get<0>(current.value()).first + 1, 0);
+			nextCoord = Coord(nextCoord.first + 1, 0);
 			if (nextCoord.first >= max)
 				return std::nullopt;
 			return std::make_tuple(nextCoord, 1, getPtr(nextCoord));
@@ -385,15 +448,38 @@ public:
 		if (!_isReverseColumnBrowsable())
 			return std::nullopt;
 
-		nextCoord = Coord((int)this->back().size() - 1, (int)this->size() - 1);
 		if (!current.has_value())
+		{
+			nextCoord = Coord((int)this->back().size() - 1, (int)this->size() - 1);
 			return std::make_tuple(nextCoord, 1, getPtr(nextCoord));
+		}
 
 		nextCoord = std::get<0>(current.value()) + Coord(0, -1);
 		if (nextCoord.second < 0)
 		{
-			nextCoord = Coord(std::get<0>(current.value()).first - 1, (int)this->size() - 1);
+			nextCoord = Coord(nextCoord.first - 1, (int)this->size() - 1);
 			if (nextCoord.first < 0)
+				return std::nullopt;
+			return std::make_tuple(nextCoord, 1, getPtr(nextCoord));
+		}
+		return std::make_tuple(nextCoord, 0, getPtr(nextCoord));
+	}
+
+	browser lineBrowse(const browser& current)
+	{
+		Coord nextCoord;
+
+		if (!current.has_value())
+		{
+			nextCoord = Coord(0, 0);
+			return std::make_tuple(nextCoord, 1, getPtr(nextCoord));
+		}
+
+		nextCoord = std::get<0>(current.value()) + Coord(1, 0);
+		if (nextCoord.first >= this->at(nextCoord.second).size())
+		{
+			nextCoord = Coord(0, nextCoord.second + 1);
+			if (nextCoord.second >= this->size())
 				return std::nullopt;
 			return std::make_tuple(nextCoord, 1, getPtr(nextCoord));
 		}
@@ -434,7 +520,10 @@ std::ostream& operator<<(std::ostream& o, const Grid<T>& g)
 {
 	for (const std::vector<T>& elt : g)
 	{
-		o << elt << std::endl;
+		for (const T& u : elt) {
+			o << u;
+		}
+		o << '\n';
 	}
 	return o;
 }
@@ -443,37 +532,58 @@ std::ostream& operator<<(std::ostream& o, const Grid<T>& g)
 
 unsigned int secureGetNumber();
 
-int getFileAndPart(int day, std::ifstream* in, unsigned int* part);
+int getFileAndPart(int day, std::ifstream& in, unsigned int& part);
 
 std::optional< long long > divisible(long long a, long long b);
 
 long long intPow(long long a, long long b);
 
+ull ullPow(ull a, ull b);
+
+ull concatNumbers(ull a, ull b);
+
 namespace math
 {
 	ui ManhattanDist(const Coord& a, const Coord& b);
+	long myModulo(long a, long b);
+
+	template<class T>
+	bool nearZero(const T &val)
+	{
+		if (val <= 0.00001 && val >= -0.00001)
+			return true;
+		return false;
+	}
+
 }
 
 namespace inputLib
 {
+	typedef std::pair< std::optional<long long>, char > extracted;
 
-	std::pair<long, bool> ExtractNextNumber(std::ifstream& input, char& monitorChar);
+	std::pair<long long, bool> extractNextNumber(std::ifstream& input, char& monitorChar);
 
-	std::pair< std::optional<long>, char> ExtractNextNumber(std::ifstream& input);
+	extracted extractNextNumber(std::ifstream& input);
+
+	extracted extractNextNumberEndline(std::ifstream& input);
 
 	char goToNextLine(std::ifstream& input, char& monitorChar, unsigned int times = 1);
 
 	void goToNextLine(std::ifstream& input, unsigned int times = 1);
 
+	std::string& carriageReturnDel(std::string& line);
+
+	std::vector<std::string> split(const std::string& str, const char* delim);
+
 }
 //Usefull class and containers
 
 template<class T, class U>
-class Graphe
+class Tries
 {
-	std::allocator< Graphe < T, U > > Alloc;
-	std::allocator_traits< std::allocator< Graphe< T, U > > > _alloc;
-	std::map< T, Graphe< T, U >* > _childs;
+	std::allocator< Tries < T, U > > Alloc;
+	std::allocator_traits< std::allocator< Tries< T, U > > > _alloc;
+	std::map< T, Tries< T, U >* > _childs;
 	U _value;
 	size_t _weight;
 	bool _valueReadable;
@@ -491,11 +601,11 @@ class Graphe
 		}
 		else
 		{
-			Graphe* child = 0;
+			Tries* child = 0;
 			if (_childs.find(*cit) == _childs.end())
 			{
 				child = _alloc.allocate(Alloc, 1);
-				_alloc.construct(Alloc, child, Graphe< T, U >());
+				_alloc.construct(Alloc, child, Tries< T, U >());
 				_childs[*cit] = child;
 				writeValue = true;
 			}
@@ -526,7 +636,7 @@ class Graphe
 	{
 		if (_valueReadable)
 			std::cout << v << " : " << _value << std::endl;
-		for (std::pair< T, Graphe< T, U >* > elt : _childs)
+		for (std::pair< T, Tries< T, U >* > elt : _childs)
 		{
 			v.push_back(elt.first);
 			elt.second->_print(v);
@@ -536,11 +646,11 @@ class Graphe
 
 public:
 
-	Graphe() : _value(U()), _weight(0), _valueReadable(false) {}
+	Tries() : _value(U()), _weight(0), _valueReadable(false) {}
 
-	~Graphe()
+	~Tries()
 	{
-		for (typename std::map< T, Graphe< T, U>* >::iterator it = _childs.begin(); it != _childs.end(); ++it)
+		for (typename std::map< T, Tries< T, U>* >::iterator it = _childs.begin(); it != _childs.end(); ++it)
 		{
 			_alloc.destroy(Alloc, it->second);
 			_alloc.deallocate(Alloc, it->second, 1);
@@ -554,9 +664,9 @@ public:
 		_addRecu(c, v, c.begin(), true);
 	}
 
-	const Graphe< T, U >* browse(const T& c) const
+	const Tries< T, U >* browse(const T& c) const
 	{
-		typename std::map< T, Graphe< T, U >* >::const_iterator find = _childs.find(c);
+		typename std::map< T, Tries< T, U >* >::const_iterator find = _childs.find(c);
 		if (find != _childs.end())
 			return find->second;
 		return 0;
@@ -601,5 +711,42 @@ public:
 		_print(std::vector< T >());
 	}
 };
+
+namespace experiment
+{
+
+    /**
+     * @brief This class build a 32 sized array of bits to represents an unsigned int.
+     * 
+     */
+    class MyNatural
+    {
+    protected:
+
+        bool		_n[32];
+        const int	_bitSize = 32;
+
+    public:
+
+        MyNatural();
+        MyNatural(unsigned int n);
+        MyNatural(const MyNatural &other);
+        MyNatural	&operator=(const MyNatural &other);
+
+        //GETTER
+
+        const bool	*getData() const;
+        int	getSize() const;
+        unsigned int	getUnsignedInt() const;
+
+        //OPERATORS OVERLOADS
+
+        MyNatural	&operator+=(const MyNatural &rhs);
+
+    };
+
+    std::ostream	&operator<<(std::ostream &o, const MyNatural &n);
+
+}
 
 #endif
