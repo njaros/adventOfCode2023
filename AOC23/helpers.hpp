@@ -40,10 +40,10 @@ Coord& operator+=(Coord& lhs, const Coord& rhs);
 Coord& operator-=(Coord& lhs, const Coord& rhs);
 Coord operator+(const Coord& lhs, const Coord& rhs);
 Coord operator-(const Coord& lhs, const Coord& rhs);
-Coord& operator*=(Coord& c, int i);
-Coord operator*(const Coord& c, int i);
-Coord& operator/=(Coord& c, int i);
-Coord operator/(const Coord& c, int i);
+Coord& operator*=(Coord& c, ll i);
+Coord operator*(const Coord& c, ll i);
+Coord& operator/=(Coord& c, ll i);
+Coord operator/(const Coord& c, ll i);
 
 template <class T>
 std::ostream& operator<<(std::ostream& o, const std::set<T>& s);

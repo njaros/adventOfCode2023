@@ -34,27 +34,27 @@ Coord operator-(const Coord& lhs, const Coord& rhs)
 	return ret;
 }
 
-Coord& operator*=(Coord& c, int i)
+Coord& operator*=(Coord& c, ll i)
 {
 	c.first *= i;
 	c.second *= i;
 	return c;
 }
 
-Coord operator*(const Coord& c, int i)
+Coord operator*(const Coord& c, ll i)
 {
 	Coord cpy(c);
 	return (cpy *= i);
 }
 
-Coord& operator/=(Coord& c, int i)
+Coord& operator/=(Coord& c, ll i)
 {
 	c.first /= i;
 	c.second /= i;
 	return c;
 }
 
-Coord operator/(const Coord& c, int i)
+Coord operator/(const Coord& c, ll i)
 {
 	Coord cpy(c);
 	return (cpy /= i);

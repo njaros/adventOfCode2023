@@ -5,6 +5,24 @@
 #define DOWN 3
 #define UP 4
 
+const std::string hexa("0123456789abcdef");
+const Coord dirs[] = {Coord(1, 0), Coord(0, 1), Coord(-1, 0), Coord(0, -1)};
+
+ll hexaToll(const std::string& hex) {
+	int hexVal;
+	ll res = 0;
+
+	for (char c: hex) {
+		hexVal = 0;
+		while (hexa[hexVal] != c)
+			++hexVal;
+		res *= 16;
+		res += hexVal;
+	}
+
+	return res;
+}
+
 static void addDir(Coord& c, int dir)
 {
 	switch (dir)
@@ -167,86 +185,45 @@ void solve(std::ifstream& input)
 	std::cout << "result is " << res << std::endl;
 }
 
-ull getSign(int* plus, int dir1, int dir2)
-{
-	bool dir1IsPlus = false;
-	bool dir2IsPlus = false;
-	if (plus[0] == dir1 || plus[1] == dir1)
-		dir1IsPlus = true;
-	if (plus[0] == dir2 || plus[1] == dir2)
-		dir2IsPlus = true;
-	if (dir1IsPlus != dir2IsPlus)
-		return -1;
-	return 1;
-}
-
 void solve2(std::ifstream& input)
 {
-	int dir1;
-	int dir2;
-	int plus[2];
-	int loop;
-	int lg1;
-	int lg2;
-	long long res = 0;
 	std::string line;
+	std::vector<Coord> points;
+	Coord current(0, 0);
+	std::string::size_type readStart;
+	ll lg;
+	ll area = 0;
 
-	loop = 0;
+	points.push_back(current);
 	while (!input.eof())
 	{
 		getline(input, line);
-		switch (line[0]) {
-			case 'R':
-				dir1 = RIGHT;
-				break;
-			case 'L':
-				dir1 = LEFT;
-				break;
-			case 'U':
-				dir1 = UP;
-				break;
-			case 'D':
-				dir1 = DOWN;
-				break;
-		}
-		lg1 = atoi(&line.c_str()[2]) + 1;
-		getline(input, line);
-		switch (line[0]) {
-			case 'R':
-				dir2 = RIGHT;
-				break;
-			case 'L':
-				dir2 = LEFT;
-				break;
-			case 'U':
-				dir2 = UP;
-				break;
-			case 'D':
-				dir2 = DOWN;
-				break;
-		}
-		lg2 = atoi(&line.c_str()[2]) + 1;
-		if (!loop)
-		{
-			plus[0] = dir1;
-			plus[1] = dir2;
-		}
-		res += lg1 * lg2 * getSign(plus, dir1, dir2);
-		++loop;
+		readStart = line.find('#');
+		lg = hexaToll(line.substr(readStart + 1, 5));
+		area += lg;
+		current += dirs[line[readStart + 6] - '0'] * lg;
+		points.push_back(current);
 	}
-	res /= 2;
-	std::cout << "is 92758" << std::endl;
-	std::cout << "result is " << res << std::endl;
+
+	for (int i = 0; i < points.size() - 1; ++i) {
+		area += (points[i].first * points[i + 1].second) - (points[i + 1].first * points[i].second);
+	}
+
+	std::cout << "result is " << area / 2 + 1 << '\n';
+
 }
 
-int day18()
+int main()
 {
 	std::ifstream input;
-	ui part;
+	ui part = 0;
 
-	if (getFileAndPart(18, &input, &part))
+	if (getFileAndPart(18, input, part))
 		return errno;
 
-	solve2(input);
+	if (part == 1)
+		solve(input);
+	else
+		solve2(input);
 	return 0;
 }
