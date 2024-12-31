@@ -77,14 +77,14 @@ struct Network
 int day20()
 {
 	std::ifstream input;
-	ui part;
+	ui part = 0;
 	Network net;
 	std::string line;
 	std::string::size_type idx;
 	NetType netType;
 	NetNode* current;
 
-	if (getFileAndPart(20, &input, &part))
+	if (getFileAndPart(100, input, part))
 		return errno;
 
 	while (!input.eof())

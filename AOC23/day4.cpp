@@ -60,9 +60,9 @@ int calculatePoints(std::set<int>& win, std::map<int, int>& nbs, unsigned int pa
 }
 
 int day4() {
-	unsigned int part;
+	unsigned int part = 0;
 	std::ifstream input;
-	if (getFileAndPart(4, &input, &part)) {
+	if (getFileAndPart(4, input, part)) {
 		return errno;
 	}
 

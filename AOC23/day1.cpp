@@ -35,7 +35,7 @@ int day1()
 	}
 	else
 	{
-		Graphe<char, int> valuesLeft;
+		Tries<char, int> valuesLeft;
 		valuesLeft["one"] = 10;
 		valuesLeft["two"] = 20;
 		valuesLeft["three"] = 30;
@@ -46,7 +46,7 @@ int day1()
 		valuesLeft["eight"] = 80;
 		valuesLeft["nine"] = 90;
 
-		Graphe<char, int> valuesRight;
+		Tries<char, int> valuesRight;
 		valuesRight["eno"] = 1;
 		valuesRight["owt"] = 2;
 		valuesRight["eerht"] = 3;
@@ -61,7 +61,7 @@ int day1()
 		std::string::const_iterator first;
 		std::string::const_reverse_iterator last;
 		std::string::size_type forward;
-		const Graphe< char, int >* browser = 0;
+		const Tries< char, int >* browser = 0;
 
 		while (!input.eof())
 		{

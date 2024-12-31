@@ -78,9 +78,9 @@ int addNumbersNear(const Coord& idx, const Grid<char>& g, std::set<Coord>& visit
 
 int day3()
 {
-	unsigned int part;
+	unsigned int part = 0;
 	std::ifstream input;
-	getFileAndPart(3, &input, &part);
+	getFileAndPart(3, input, part);
 
 	Grid<char> grid;
 	std::set<Coord> symbolsPos;
