@@ -194,6 +194,56 @@ long math::myModulo(long a, long b) {
 		return (b - (-a % b)) % b;
 }
 
+bool math::isPrime(ull n) {
+	int p = 2;
+
+	while (p < (n / 2))
+	{
+		if (n % p == 0)
+			return false;
+		++p;
+	}
+	return true;
+}
+
+ull math::getNextPrime(ull n) {
+	++n;
+	while (!isPrime(n))
+		++n;
+	return n;
+}
+
+std::map<ull, int> math::primeDecompose(ull n) {
+	std::map<ull, int> primed;
+	ull prime = 2;
+
+	while (n < prime) {
+		while (n % prime == 0) {
+			primed[prime] += 1;
+			n /= prime;
+		}
+		prime = getNextPrime(prime);
+	}
+	if (n != 1)
+		primed[n] += 1;
+	return primed;
+}
+
+ull math::PPCM(std::vector<ull> nbrs) {
+	std::map<ull, int> primed;
+	ull result = 1;
+
+	for (ull n : nbrs) {
+		for (std::pair<ull, int> elt : math::primeDecompose(n)) {
+			primed[elt.first] = std::max(primed[elt.first], elt.second);
+		}
+	}
+	
+	for (std::pair<ull, int> elt : primed)
+		result *= ullPow(elt.first, elt.second);
+	return result;
+}
+
 std::pair<long long, bool> inputLib::extractNextNumber(std::ifstream& input, char& monitorChar)
 {
 	long long res = 0;

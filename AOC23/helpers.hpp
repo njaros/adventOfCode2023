@@ -555,6 +555,14 @@ namespace math
 		return false;
 	}
 
+	bool isPrime(ull n);
+
+	ull getNextPrime(ull n);
+
+	std::map<ull, int> primeDecompose(ull n);
+
+	ull PPCM(std::vector<ull> nbrs);
+
 }
 
 namespace inputLib
