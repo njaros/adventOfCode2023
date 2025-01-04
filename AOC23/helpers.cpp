@@ -90,6 +90,7 @@ int getFileAndPart(int day, std::ifstream& in, unsigned int& part)
 	{
 		std::cout << "which part ? (1 or 2)\r\n";
 		std::cin >> part;
+		std::cin.clear();
 		if (part != 2)
 			part = 1;
 	}
@@ -353,6 +354,11 @@ std::string& inputLib::carriageReturnDel(std::string& line) {
 			++it;
 	}
 	return line;
+}
+
+void inputLib::waitEnter() {
+	std::cin.ignore();
+	std::cin.clear();
 }
 
 std::vector<std::string> inputLib::split(const std::string& str, const char* delim) {

@@ -177,6 +177,14 @@ public:
 		}
 	}
 
+	Grid(std::ifstream& input,
+		typename std::enable_if<std::is_same<char, T>::value, void>::type* = 0) {
+		while (!input.eof()){
+			char c = input.get();
+			addBackElt(c, '\n', {'\r', EOF});
+		}
+	}
+
 	void addEmptyLine()
 	{
 		this->push_back(line());
@@ -582,6 +590,8 @@ namespace inputLib
 	std::string& carriageReturnDel(std::string& line);
 
 	std::vector<std::string> split(const std::string& str, const char* delim);
+
+	void waitEnter();
 
 }
 //Usefull class and containers
