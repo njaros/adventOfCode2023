@@ -214,6 +214,168 @@ ull math::getNextPrime(ull n) {
 	return n;
 }
 
+bool interval::operator==(const Elt& lhs, const Elt& rhs) {
+    return (lhs.first == rhs.first && lhs.second == rhs.second);
+}
+bool interval::operator<(const Elt& lhs, const Elt& rhs) {
+    return (
+        lhs.first < rhs.first ||
+        (lhs.first == rhs.first && !lhs.second && rhs.second)
+    );
+}
+bool interval::operator>=(const Elt& lhs, const Elt& rhs) {return !(lhs < rhs);}
+bool interval::operator>(const Elt& lhs, const Elt& rhs)  {return rhs < lhs;}
+bool interval::operator<=(const Elt& lhs, const Elt& rhs) {return rhs >= lhs;}
+
+interval::Interval::Interval(): l(0, false), r(0, false) {}
+interval::Interval::Interval(const Interval& o): l(o.l), r(o.r) {}
+interval::Interval::Interval(Elt a, Elt b): l(a), r(b) {}
+interval::Interval::Interval(ll a, ll b): l(Elt(a, true)), r(Elt(b, true)) {}
+interval::Interval& interval::Interval::operator=(const Interval& o) {
+	l = o.l;
+	r = o.r;
+	return *this;
+}
+
+bool interval::Interval::overlapsWith(const Interval& o) const {
+	if (empty() || o.empty())
+		return false;
+	if (l.first > o.r.first || r.first < o.l.first)
+		return false;
+	if (l.first == o.r.first && !l.second && !o.r.second)
+		return false;
+	if (r.first == o.l.first && !r.second && !o.l.second)
+		return false;
+	return true;
+}
+
+bool interval::Interval::joinableWith(const Interval& o) const {
+	if (empty())
+		return true;
+	if (o.empty())
+		return false;
+	if (
+		(l.first == o.r.first + 1 && l.second && o.r.second) ||
+		(r.first == o.l.first - 1 && r.second && o.l.second))
+		return true;
+	return overlapsWith(o);
+}
+
+bool interval::Interval::include(const Interval& o) const {
+	return (
+		((l.first < o.l.first) || (l.first == o.l.first && !(o.l.second && !l.second))) &&
+		((r.first > o.r.first) || (r.first == o.r.first && !(o.r.second && !r.second)))
+	);
+}
+
+bool interval::Interval::isIncludedIn(const Interval& o) const {
+	return o.include(*this);
+}
+
+bool interval::Interval::empty() const {
+	return l > r || (l.first == r.first && !(l.second && r.second));
+}
+
+ll interval::Interval::length() const {
+	return r.first - l.first + r.second + l.second - 1;
+}
+
+interval::Interval& interval::Interval::operator|=(const Interval& o) {
+	if (empty() && !o.empty())
+		*this = o;
+	else if (joinableWith(o)) {
+		if (o.l < l)
+			l = o.l;
+		if (r < o.r)
+			r = o.r;
+	}
+	return *this;
+}
+
+interval::Interval interval::Interval::operator|(const Interval& o) const {
+	Interval cpy(*this);
+
+	return cpy |= o;
+}
+
+interval::Interval& interval::Interval::operator&=(const Interval& o) {
+	if (o.l > l)
+		l = o.l;
+	if (o.r < r)
+		r = o.r;
+	return *this;
+}
+
+interval::Interval interval::Interval::operator&(const Interval& o) const {
+	Interval cpy(*this);
+
+	return cpy &= o;
+}
+
+/**
+ * Check where is the number n.
+ * returns 0 if n is in the interval.
+ * returns 1 if n is superior to the max of the interval.
+ * returns -1 if n is inferior to the min of the interval.
+ */
+bool interval::Interval::where(ll n) const {
+	if (
+		!empty() && (
+			(n < r.first && n > l.first) ||
+			(n == r.first && r.second) ||
+			(n == l.first && l.second)
+		)
+	)
+		return 0;
+	if (n < l.first)
+		return -1;
+	return 1;
+}
+
+/**
+ * Set the interval to be inferior of n.
+ */
+interval::Interval& interval::Interval::operator<=(ll n) {
+	if (r.first >= n)
+		r.first = n - 1;
+	return *this;
+}
+
+interval::Interval interval::Interval::operator<(ll n) const {
+	Interval cpy(*this);
+
+	return cpy <= n;
+}
+
+/**
+ * Set the interval to be superior of n.
+ */
+interval::Interval& interval::Interval::operator>=(ll n) {
+	if (l.first <= n)
+		l.first = n + 1;
+	return *this;
+}
+
+interval::Interval interval::Interval::operator>(ll n) const {
+	Interval cpy(*this);
+
+	return cpy >= n;
+}
+
+std::ostream& interval::operator<<(std::ostream& o, const interval::Interval& i) {
+    if (i.l.second)
+        o << '[';
+    else
+        o << ']';
+    o << i.l.first << "; " << i.r.first;
+    if (i.r.second)
+        o << ']';
+    else
+        o << '[';
+    return o;
+}
+
+
 std::map<ull, int> math::primeDecompose(ull n) {
 	std::map<ull, int> primed;
 	ull prime = 2;

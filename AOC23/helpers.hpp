@@ -573,6 +573,78 @@ namespace math
 
 }
 
+namespace interval
+{
+
+	typedef std::pair<ll, bool> Elt;
+	bool operator==(const Elt& lhs, const Elt& rhs);
+	bool operator<(const Elt& lhs, const Elt& rhs);
+	bool operator>=(const Elt& lhs, const Elt& rhs);
+	bool operator>(const Elt& lhs, const Elt& rhs);
+	bool operator<=(const Elt& lhs, const Elt& rhs);
+
+
+	class Interval {
+
+	public:
+
+		Elt l;
+		Elt r;
+
+		Interval();
+		Interval(const Interval& o);
+		Interval(Elt a, Elt b);
+		Interval(ll a, ll b);
+		Interval& operator=(const Interval& o);
+
+		bool overlapsWith(const Interval& o) const;
+
+		bool joinableWith(const Interval& o) const;
+
+		bool include(const Interval& o) const;
+
+		bool isIncludedIn(const Interval& o) const;
+
+		bool empty() const;
+
+		ll length() const;
+
+		Interval& operator|=(const Interval& o);
+
+		Interval operator|(const Interval& o) const;
+
+		Interval& operator&=(const Interval& o);
+
+		Interval operator&(const Interval& o) const;
+
+		/**
+		 * Check where is the number n.
+		 * returns 0 if n is in the interval.
+		 * returns 1 if n is superior to the max of the interval.
+		 * returns -1 if n is inferior to the min of the interval.
+		 */
+		bool where(ll n) const;
+
+		/**
+		 * Set the interval to be inferior of n.
+		 */
+		Interval& operator<=(ll n);
+
+		Interval operator<(ll n) const;
+
+		/**
+		 * Set the interval to be superior of n.
+		 */
+		Interval& operator>=(ll n);
+
+		Interval operator>(ll n) const;
+
+	};
+
+	std::ostream& operator<<(std::ostream& o, const Interval& i);
+
+}
+
 namespace inputLib
 {
 	typedef std::pair< std::optional<long long>, char > extracted;
