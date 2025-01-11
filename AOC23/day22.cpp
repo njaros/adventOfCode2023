@@ -4,9 +4,6 @@ class Brick;
 
 typedef interval::Interval Inter;
 typedef std::unordered_map<int, Brick> Bricks;
-typedef std::unordered_map<int, ull> Cache;
-
-Cache cache;
 
 class Brick {
 public:
@@ -88,19 +85,6 @@ public:
                 return false;
         }
         return true;
-    }
-
-    ull countFalls() {
-        ull res = 0;
-        if (cache.find(id) != cache.end())
-            return cache[id];
-        for (int idx : upperBricks) {
-            if (all->at(idx).underBricks.size() == 1) {
-                res += 1 + all->at(idx).countFalls();
-            }
-        }
-        cache[id] = res;
-        return res;
     }
 
 };
@@ -195,10 +179,10 @@ int main() {
                 }
             }
             res += movedId.size();
-            std::cout << ++loop << '\n';
+            std::cout << ++loop << "/1370\n";
         } 
     }
-    std::cout << "13274 too low\nresult is " << res << '\n';
+    std::cout << "result is " << res << '\n';
 
     return 0;
 }
