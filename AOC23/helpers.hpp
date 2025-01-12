@@ -116,6 +116,86 @@ std::ostream& operator<<(std::ostream& o, const std::map<T, U>& m)
 //Usefull simple class and their typedefs
 
 template <class T>
+class Coord3D {
+
+	typedef T value_type;
+	typedef T& reference;
+	typedef T* pointer;
+	typedef const reference const_reference;
+	typedef const pointer const_pointer;
+
+public:
+
+	value_type x;
+	value_type y;
+	value_type z;
+
+	Coord3D(): x(0), y(0), z(0) {}
+	Coord3D(value_type x_, value_type y_, value_type z_): x(x_), y(y_), z(z_) {}
+	Coord3D(const Coord3D& o): x(o.x), y(o.y), z(o.z) {}
+	reference operator=(const Coord3D& o) {
+		x = o.x;
+		y = o.y;
+		z = o.z;
+		return *this;
+	}
+
+	reference operator+=(const Coord3D& rhs) {
+		x += rhs.x;
+		y += rhs.y;
+		z += rhs.z;
+		return *this;
+	}
+
+	value_type operator+(const Coord3D& rhs) const {
+		value_type cpy(&this);
+		return cpy += rhs;
+	}
+
+	reference operator-=(const Coord3D& rhs) {
+		x -= rhs.x;
+		y -= rhs.y;
+		z -= rhs.z;
+		return *this;
+	}
+
+	value_type operator-(const Coord3D& rhs) const {
+		value_type cpy(&this);
+		return cpy -= rhs;
+	}
+
+	template <class U>
+	reference operator*=(const U& scalar) {
+		x *= scalar;
+		y *= scalar;
+		z *= scalar;
+		return *this;		
+	}
+
+	template <class U>
+	value_type operator*(const U& scalar) const {
+		value_type cpy(&this);
+	
+		return cpy *= scalar;
+	}
+
+		template <class U>
+	reference operator/=(const U& scalar) {
+		x /= scalar;
+		y /= scalar;
+		z /= scalar;
+		return *this;		
+	}
+
+	template <class U>
+	value_type operator/(const U& scalar) const {
+		value_type cpy(&this);
+	
+		return cpy /= scalar;
+	}
+};
+
+template <class T>
 class Grid : public std::vector<std::vector<T>> {
 
 
