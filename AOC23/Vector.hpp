@@ -41,7 +41,7 @@ protected :
     size_type	_firstNonZero()
     {
         size_type	idx = 0;
-        while (!_components[idx] && idx < size())
+        while (idx < size() && !_components[idx])
             ++idx;
         return idx;
     }
